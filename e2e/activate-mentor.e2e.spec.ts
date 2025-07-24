@@ -63,7 +63,7 @@ describe('Activate mentor (E2E)', () => {
       .patch('/mentor/active')
       .query({ email: 'notfound@example.com', code: 'wrong-code' });
 
-      console.log(response.body)
+    console.log(response.body);
     expect(response.statusCode).toBe(404);
     expect(response.body).toEqual({
       message: 'Mentor not found',
@@ -106,14 +106,12 @@ describe('Activate mentor (E2E)', () => {
       .query({ email: 'missing.code@example.com' });
 
     expect(response.statusCode).toBe(400);
-    expect(response.body.message).toContain(
-      'code must be a string',
-    );
+    expect(response.body.message).toContain('code must be a string');
   });
-  
+
   afterEach(async () => {
-    await prisma.mentors.deleteMany()
-  })
+    await prisma.mentors.deleteMany();
+  });
 
   afterAll(async () => {
     await app.close();

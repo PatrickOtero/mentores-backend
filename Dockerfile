@@ -1,17 +1,18 @@
-FROM node:19-alpine AS builder
+FROM node:18-alpine AS builder
 WORKDIR /usr/src/app
+
+RUN apk add --no-cache python3 make g++
 
 COPY package*.json ./
 COPY prisma ./prisma/
-COPY tsconfig*.json ./
-COPY . .
-
 RUN npm install
 RUN npm rebuild bcrypt
-RUN npx prisma generate 
+RUN npx prisma generate
+
+COPY . .
 RUN npm run build
 
-FROM node:19-alpine
+FROM node:18-alpine
 WORKDIR /usr/src/app
 
 COPY --from=builder /usr/src/app/node_modules ./node_modules

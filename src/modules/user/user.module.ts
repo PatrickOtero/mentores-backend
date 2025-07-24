@@ -14,6 +14,7 @@ import { RedefineUserPasswordService } from './services/redefineUserPassword.ser
 import { SendRestorationEmailService } from './services/sendRestorationEmail.service';
 import { UpdateUserService } from './services/updateUser.service';
 import { UploadProfileImageService } from './services/uploadProfileImage.service';
+import { NorthFlankTestMethod } from './services/northFlankTest.service';
 
 @Module({
   imports: [MailModule, PassportModule.register({ defaultStrategy: 'jwt' })],
@@ -31,6 +32,7 @@ import { UploadProfileImageService } from './services/uploadProfileImage.service
     UserRepository,
     GenerateCodeUtil,
     FileUploadService,
+    NorthFlankTestMethod
   ],
   exports: [UserRepository],
 })
