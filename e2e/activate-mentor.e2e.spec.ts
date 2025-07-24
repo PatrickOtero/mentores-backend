@@ -1,6 +1,6 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { PrismaService } from 'prisma/service/prisma.service';
+import { PrismaService } from '../prisma/service/prisma.service';
 import { AppModule } from 'src/app.module';
 import request from 'supertest';
 
