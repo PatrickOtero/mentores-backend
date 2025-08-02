@@ -215,15 +215,4 @@ export class MailService {
     return;
   }
 
-  async sendEmail({ subject, template, context, email }: EmailTemplateType) {
-    return; // remover depois que for resolvido
-    await this.mailerService.sendMail({
-      to: email,
-      subject,
-      template,
-      context,
-    });
-
-    return;
-  }
 }
