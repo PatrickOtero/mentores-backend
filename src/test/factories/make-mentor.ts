@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'prisma/service/prisma.service';
+import { PrismaService } from '../../../prisma/service/prisma.service';
 import { MentorEntity } from 'src/modules/mentors/entities/mentor.entity';
 import { Gender } from 'src/modules/mentors/enums/gender.enum';
 import { Specialties } from 'src/modules/mentors/enums/specialties.enum';
