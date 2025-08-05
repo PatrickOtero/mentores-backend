@@ -36,7 +36,6 @@ services:
     command: >
       sh -c "npx prisma migrate deploy &&
              npm run start:prod"
-
 volumes:
   pgdata:
     driver: local
