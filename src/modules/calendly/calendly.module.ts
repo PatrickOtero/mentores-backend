@@ -5,7 +5,7 @@ import { InitiateOAuthService } from "./services/calendlyOAuth.service";
 import { RefreshTokenService } from "./services/refresh-token.service";
 import { FetchSchedulesService } from "./services/fetch-schedules.service";
 import { MentorRepository } from "../mentors/repository/mentor.repository";
-import { PrismaService } from "prisma/service/prisma.service";
+import { PrismaService } from "../../../prisma/service/prisma.service";
 import { CalendlyRepository } from "./repository/calendly.repository";
 import { JwtService } from "@nestjs/jwt";
 import { CreateCalendlyInfoService } from "./services/create-calendly-info.service";
