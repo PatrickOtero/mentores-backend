@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Delete, Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { GenerateCodeUtil } from '../../shared/utils/generate-code.util';
 import { MailModule } from '../mails/mail.module';
@@ -21,6 +21,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ListAllRegisteredMentorsService } from './services/listAllRegisteredMentors.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ResendConfirmationEmailService } from './services/resendConfirmationEmail.service';
+import { DeleteExpiredMentorsService } from './services/deleteExpiredMentors.service';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { ResendConfirmationEmailService } from './services/resendConfirmationEma
     FileUploadService,
     JwtService,
     ResendConfirmationEmailService,
+    DeleteExpiredMentorsService,
   ],
   exports: [MentorRepository],
 })

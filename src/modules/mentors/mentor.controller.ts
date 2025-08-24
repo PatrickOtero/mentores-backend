@@ -69,17 +69,17 @@ export class MentorController {
     private finishMentorRegisterService: FinishMentorRegisterService,
     private getRegisteredMentorsService: ListAllRegisteredMentorsService,
     private resendConfirmationEmailService: ResendConfirmationEmailService,
-  ) {}
+  ) { }
 
   @Post()
   @SwaggerCreateMentor()
   async createMentor(
     @Body() createMentorDto: CreateMentorDto,
     @Res() res: Response
-   ) {
+  ) {
     const { message, statusCode } = await this.createMentorService.execute(createMentorDto);
 
-    return res.json({message: message}).status(statusCode)
+    return res.json({ message: message }).status(statusCode)
   }
 
   @ApiExcludeEndpoint()

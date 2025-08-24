@@ -126,6 +126,7 @@ export class MentorRepository extends PrismaClient {
         data: {
           deleted: true,
           updatedAt: new Date(),
+          deactivatedAt: new Date(),
         },
       })
       .catch(handleError);
@@ -146,4 +147,34 @@ export class MentorRepository extends PrismaClient {
       .update({ where: { id }, data: { registerComplete: true } })
       .catch(handleError);
   }
+
+  async findExpiredMentorsAndDelete(): Promise<void> {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const expiredMentors = await this.mentors.findMany({
+      where: {
+        deleted: true,
+        deactivatedAt: {
+          lte: thirtyDaysAgo, //let == menor ou igual a
+        },
+      },
+    });
+
+    if (expiredMentors.length > 0) {
+      const idsToDelete = expiredMentors.map((mentor) => mentor.id);
+
+      await this.mentors.deleteMany({
+        where: {
+          id: {
+            in: idsToDelete,
+          },
+        },
+      });
+      console.log(`${idsToDelete.length} mentores expirados foram excluídos permanentemente.`);
+    }
+
+  }
+
 }
+
