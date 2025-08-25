@@ -176,5 +176,22 @@ export class MentorRepository extends PrismaClient {
 
   }
 
+  async findMentorsDeactivatedFor(days: number): Promise<MentorEntity[]> {
+  const targetDate = new Date();
+  targetDate.setDate(targetDate.getDate() - days);
+
+  const startDate = new Date(targetDate.setHours(0, 0, 0, 0)); // Início do dia
+  const endDate = new Date(targetDate.setHours(23, 59, 59, 999)); // Fim do dia
+
+  return this.mentors.findMany({
+    where: {
+      deleted: true,
+      deactivatedAt: {
+        gte: startDate, // Maior ou igual ao início do dia
+        lte: endDate,   // Menor ou igual ao fim do dia
+      },
+    },
+  });
+}
 }
 
