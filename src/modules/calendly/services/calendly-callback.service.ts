@@ -1,13 +1,16 @@
-import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CalendlyRepository } from '../repository/calendly.repository';
 import { IHttpAdapter } from '../../../lib/adapter/httpAdapterInterface';
-
 
 @Injectable()
 export class OAuthCallbackService {
   constructor(
     private readonly calendlyRepository: CalendlyRepository,
-    @Inject("IHttpAdapter") private readonly httpAdapter: IHttpAdapter
+    @Inject('IHttpAdapter') private readonly http: IHttpAdapter,
   ) {}
 
   async execute(code: string, mentorId: string) {
@@ -18,36 +21,44 @@ export class OAuthCallbackService {
     }
 
     try {
-      const tokenResponse = await this.httpAdapter.callbackPost(
-        '/oauth/token',
-        new URLSearchParams({
-          grant_type: 'authorization_code',
-          code: code,
-          redirect_uri: process.env.SOUJUNIOR_REDIRECT_URI,
-          client_id: process.env.SOUJUNIOR_CLIENT_ID,
-          client_secret: process.env.SOUJUNIOR_CLIENT_SECRET,
-        }),
+      const body = new URLSearchParams({
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: process.env.SOUJUNIOR_REDIRECT_URI,
+        client_id: process.env.SOUJUNIOR_CLIENT_ID,
+        client_secret: process.env.SOUJUNIOR_CLIENT_SECRET,
+      }).toString();
+
+      const tokenResponse = await this.http.post(
+        'https://auth.calendly.com/oauth/token',
+        body,
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Accept: 'application/json',
+          },
+        },
       );
 
-      const accessToken = tokenResponse.access_token;
-      const refreshToken = tokenResponse.refresh_token;
-      const expiresIn = tokenResponse.expires_in;
-      const expirationTime = new Date(Date.now() + expiresIn * 1000);
+      const { access_token, refresh_token, expires_in } = tokenResponse;
+      const expirationTime = new Date(Date.now() + Number(expires_in) * 1000);
 
       await this.calendlyRepository.updateCalendlyInfo(mentorId, {
-        calendlyAccessToken: accessToken,
-        calendlyRefreshToken: refreshToken,
+        calendlyAccessToken: access_token,
+        calendlyRefreshToken: refresh_token,
         accessTokenExpiration: expirationTime,
       });
 
       return { message: 'OAuth successful' };
-    } catch (error) {
-      console.error(
-        'Error during OAuth process:',
-        error.response?.data || error.message,
-      );
+    } catch (err: any) {
+      const status = err.response?.status;
+      const data = err.response?.data;
+      console.error('[Calendly OAuth] token error', { status, data });
+
       throw new InternalServerErrorException(
-        'OAuth process failed. Please try again.',
+        `OAuth process failed: ${status ?? 'unknown'} ${
+          typeof data === 'string' ? data : JSON.stringify(data)
+        }`,
       );
     }
   }
