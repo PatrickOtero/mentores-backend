@@ -1,7 +1,8 @@
-/node_modulesnode_modules
+node_modules
 dist
 .git
-.gitignore
-Dockerfile*
+.prisma
+coverage
 npm-debug.log
-.env
+Dockerfile
+docker-compose.yml
