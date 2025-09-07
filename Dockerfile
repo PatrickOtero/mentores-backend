@@ -1,40 +1,29 @@
-FROM node:19-alpine AS base
+FROM node:20-alpine AS builder
 WORKDIR /usr/src/app
-ENV CI=true
 
-FROM base AS builder
+RUN apk add --no-cache python3 make g++ libc6-compat
 
-RUN apk add --no-cache python3 make g++
+ENV npm_config_build_from_source=true
+
 COPY package*.json ./
-RUN npm ci
+COPY prisma ./prisma/
+RUN npm install
 
-COPY prisma ./prisma
+RUN npm rebuild bcrypt --build-from-source
 RUN npx prisma generate
 
 COPY . .
-
-RUN npm rebuild bcrypt --build-from-source
 RUN npm run build
 
-FROM base AS runner
-ENV NODE_ENV=production
+FROM node:20-alpine
+WORKDIR /usr/src/app
+
+RUN apk add --no-cache libc6-compat
 
 COPY --from=builder /usr/src/app/node_modules ./node_modules
-RUN npm prune --omit=dev && npm cache clean --force
-
 COPY --from=builder /usr/src/app/package*.json ./
 COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/prisma ./prisma
 
 EXPOSE 3000
-
-CMD ["npm","run","start:prod"]
-
-FROM base AS migrator
-
-COPY package*.json ./
-RUN npm ci
-COPY prisma ./prisma
-
-RUN npx prisma --version
-
-CMD ["npx","prisma","migrate","deploy"]
+CMD ["npm", "run", "start:prod"]
