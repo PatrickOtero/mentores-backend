@@ -8,6 +8,7 @@ import { MentorEntity } from '../entities/mentor.entity';
 @Injectable()
 export class MentorRepository extends PrismaClient {
   async findDeactivatedMentors(): Promise<MentorEntity[]> {
+    // achar os mentores desativados
     return this.mentors
       .findMany({
         where: {
@@ -22,38 +23,36 @@ export class MentorRepository extends PrismaClient {
   }
 
   async findAllMentors(): Promise<MentorEntity[]> {
-    return this.mentors
-      .findMany({
-        select: {
-          id: true,
-          fullName: true,
-          email: true,
-          gender: true,
-          aboutMe: true,
-          specialties: true,
-          role: true,
-          dateOfBirth: true,
-          emailConfirmed: true,
-          registerComplete: true,
-          accessAttempt: true,
-          code: true,
-          deleted: true,
-          calendlyInfo: true,
-          history: true,
-          testimony: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-        where: {
-          deleted: false,
-        },
-      })
-      .catch(handleError);
+    return this.mentors.findMany({
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        gender: true,
+        aboutMe: true,
+        specialties: true,
+        role: true,
+        dateOfBirth: true,
+        emailConfirmed: true,
+        registerComplete: true,
+        accessAttempt: true,
+        code: true,
+        deleted: true,
+        calendlyInfo: true,
+        history: true,
+        testimony: true,
+        createdAt: true,
+        updatedAt: true
+      },
+      where: {
+        deleted: false
+      }
+    }).catch(handleError);
   }
 
   async findAllRegisteredMentors(): Promise<MentorEntity[]> {
     return this.mentors
-      .findMany({ where: { registerComplete: true } })
+      .findMany({ where: { registerComplete: true, deleted: false } })
       .catch(handleError);
   }
 

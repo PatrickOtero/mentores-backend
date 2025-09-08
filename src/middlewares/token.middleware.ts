@@ -11,7 +11,7 @@ export class TokenMiddleware implements NestMiddleware {
     private readonly mentorRepository: MentorRepository,
     private readonly refreshTokenService: RefreshTokenService,
     private readonly jwtService: JwtService,
-    private readonly calendlyInfoRepository: CalendlyRepository,
+    private readonly calendlyInfoRepository: CalendlyRepository
   ) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
@@ -38,37 +38,25 @@ export class TokenMiddleware implements NestMiddleware {
       return res.status(404).send('Mentor not found');
     }
 
-    const calendlyInfo =
-      await this.calendlyInfoRepository.getCalendlyInfoByMentorId(mentor.id);
+    const calendlyInfo = await this.calendlyInfoRepository.getCalendlyInfoByMentorId(mentor.id);
 
     if (!calendlyInfo || !calendlyInfo.calendlyAccessToken) {
-      return res
-        .status(404)
-        .send('Calendly info not found or access token is missing');
+      return res.status(404).send('Calendly info not found or access token is missing');
     }
 
-    const isExpired = this.isAccessTokenExpired(
-      calendlyInfo.accessTokenExpiration,
-    );
+    const isExpired = this.isAccessTokenExpired(calendlyInfo.accessTokenExpiration);
 
     if (isExpired) {
       try {
         await this.refreshTokenService.execute(mentorEmail);
-        const updatedCalendlyInfo =
-          await this.calendlyInfoRepository.getCalendlyInfoByMentorId(
-            mentor.id,
-          );
-        req.headers[
-          'Authorization'
-        ] = `Bearer ${updatedCalendlyInfo.calendlyAccessToken}`;
+        const updatedCalendlyInfo = await this.calendlyInfoRepository.getCalendlyInfoByMentorId(mentor.id);
+        req.headers['Authorization'] = `Bearer ${updatedCalendlyInfo.calendlyAccessToken}`;
       } catch (error) {
         console.error('Error refreshing access token:', error.message);
         return res.status(500).send('Could not refresh access token');
       }
     } else {
-      req.headers[
-        'Authorization'
-      ] = `Bearer ${calendlyInfo.calendlyAccessToken}`;
+      req.headers['Authorization'] = `Bearer ${calendlyInfo.calendlyAccessToken}`;
     }
 
     next();

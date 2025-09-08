@@ -20,7 +20,6 @@ import { UploadProfileImageService } from './services/uploadProfileImage.service
 import { JwtService } from '@nestjs/jwt';
 import { ListAllRegisteredMentorsService } from './services/listAllRegisteredMentors.service';
 import { ScheduleModule } from '@nestjs/schedule';
-import { ResendConfirmationEmailService } from './services/resendConfirmationEmail.service';
 
 @Module({
   imports: [
@@ -47,7 +46,6 @@ import { ResendConfirmationEmailService } from './services/resendConfirmationEma
     GenerateCodeUtil,
     FileUploadService,
     JwtService,
-    ResendConfirmationEmailService,
   ],
   exports: [MentorRepository],
 })

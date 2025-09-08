@@ -49,7 +49,6 @@ import { SwaggerCompleteRegister } from '../../shared/Swagger/decorators/complet
 import { SwaggerChangePassword } from '../../shared/Swagger/decorators/change-password.swagger';
 import { SwaggerUploadProfileImage } from '../../shared/Swagger/decorators/uploadProfileImage.swagger';
 import { ListAllRegisteredMentorsService } from './services/listAllRegisteredMentors.service';
-import { ResendConfirmationEmailService } from './services/resendConfirmationEmail.service';
 
 @ApiTags('mentor')
 @Controller('mentor')
@@ -68,28 +67,27 @@ export class MentorController {
     private uploadProfileImageService: UploadProfileImageService,
     private finishMentorRegisterService: FinishMentorRegisterService,
     private getRegisteredMentorsService: ListAllRegisteredMentorsService,
-    private resendConfirmationEmailService: ResendConfirmationEmailService,
   ) {}
 
   @Post()
   @SwaggerCreateMentor()
   async createMentor(
     @Body() createMentorDto: CreateMentorDto,
-    @Res() res: Response,
-  ) {
-    const { message, statusCode } = await this.createMentorService.execute(
-      createMentorDto,
-    );
+    @Res() res: Response
+   ) {
+    const { message, statusCode } = await this.createMentorService.execute(createMentorDto);
 
-    return res.json({ message: message }).status(statusCode);
+    return res.json({message: message}).status(statusCode)
   }
 
   @ApiExcludeEndpoint()
   @Get()
-  async getAllMentors(@Res() res: Response) {
+  async getAllMentors(
+    @Res() res: Response
+  ) {
     const mentorsList = await this.listAllMentorsService.execute();
 
-    return res.json(mentorsList).status(200);
+    return res.json(mentorsList).status(200)
   }
 
   @Get('registered')
@@ -207,10 +205,5 @@ export class MentorController {
     } catch (error) {
       console.log(error.message);
     }
-  }
-
-  @Post('resend-confirmation-email')
-  async resendConfirmationEmail(@Body() data: SearchByEmailDto) {
-    return this.resendConfirmationEmailService.execute(data.email);
   }
 }

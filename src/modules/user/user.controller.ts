@@ -55,7 +55,7 @@ export class UserController {
     private sendRestorationEmailService: SendRestorationEmailService,
     private updateUserService: UpdateUserService,
     private uploadProfileImageService: UploadProfileImageService,
-    private northFlankTestMethod: NorthFlankTestMethod,
+    private northFlankTestMethod: NorthFlankTestMethod
   ) {}
 
   @Post()

@@ -6,6 +6,7 @@ import { MentorRepository } from '../../repository/mentor.repository';
 import { ActivateMentorDto } from '../../dtos/activate-mentor.dto';
 import { MentorPassConfirmationDto } from '../../dtos/mentor-pass-confirmation.dto';
 
+
 let redefineMentorPasswordService: RedefineMentorPasswordService;
 let inMemoryMentorRepository: InMemoryMentorRepository;
 
@@ -36,10 +37,7 @@ describe('RedefineMentorPasswordService', () => {
       confirmPassword: 'New@Password123',
     };
 
-    const result = await redefineMentorPasswordService.execute(
-      queryData,
-      passData,
-    );
+    const result = await redefineMentorPasswordService.execute(queryData, passData);
 
     expect(result).toEqual({ message: 'Mentor not found' });
   });
@@ -54,15 +52,12 @@ describe('RedefineMentorPasswordService', () => {
       confirmPassword: 'New@Password123',
     };
 
-    const result = await redefineMentorPasswordService.execute(
-      queryData,
-      passData,
-    );
+    const result = await redefineMentorPasswordService.execute(queryData, passData);
 
     expect(result).toEqual({ message: 'The code is invalid' });
   });
 
-  it('Should return "The passwords don\'t match" if the password and confirmation do not match', async () => {
+  it("Should return \"The passwords don't match\" if the password and confirmation do not match", async () => {
     const queryData: ActivateMentorDto = {
       email: 'john.doe@example.com',
       code: '1234',
@@ -72,10 +67,7 @@ describe('RedefineMentorPasswordService', () => {
       confirmPassword: 'Different@Password123',
     };
 
-    const result = await redefineMentorPasswordService.execute(
-      queryData,
-      passData,
-    );
+    const result = await redefineMentorPasswordService.execute(queryData, passData);
 
     expect(result).toEqual({ message: "The passwords don't match" });
   });
@@ -90,10 +82,7 @@ describe('RedefineMentorPasswordService', () => {
       confirmPassword: 'New@Password123',
     };
 
-    const result = await redefineMentorPasswordService.execute(
-      queryData,
-      passData,
-    );
+    const result = await redefineMentorPasswordService.execute(queryData, passData);
 
     const mentor = await inMemoryMentorRepository.findMentorByEmail(
       queryData.email,
@@ -101,9 +90,7 @@ describe('RedefineMentorPasswordService', () => {
 
     expect(result).toEqual({ message: 'The account was restored sucessfully' });
     expect(mentor?.password).not.toBe('New@Password123');
-    expect(
-      await bcrypt.compare('New@Password123', mentor?.password || ''),
-    ).toBe(true);
+    expect(await bcrypt.compare('New@Password123', mentor?.password || '')).toBe(true);
     expect(mentor?.code).toBeNull();
     expect(mentor?.accessAttempt).toBe(0);
   });
@@ -118,10 +105,7 @@ describe('RedefineMentorPasswordService', () => {
       confirmPassword: 'New@Password123',
     };
 
-    const result = await redefineMentorPasswordService.execute(
-      queryData,
-      passData,
-    );
+    const result = await redefineMentorPasswordService.execute(queryData, passData);
 
     expect(result).toEqual({ message: 'Mentor not found' });
   });

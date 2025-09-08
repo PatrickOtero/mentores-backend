@@ -37,8 +37,8 @@ describe('FileUploadService', () => {
       promise: jest.fn().mockRejectedValue(new Error('Some error')),
     });
 
-    await expect(
-      fileUploadService.deleteFile('some-file-name'),
-    ).rejects.toThrowError(InternalServerErrorException);
+    await expect(fileUploadService.deleteFile('some-file-name')).rejects.toThrowError(
+      InternalServerErrorException,
+    );
   });
 });

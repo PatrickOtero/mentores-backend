@@ -12,6 +12,7 @@ import { accessAttemptMessage } from '../enums/message.enum';
 import IHashAdapter from 'src/lib/adapter/hash/hashAdapterInterface';
 import { CalendlyRepository } from '../../../modules/calendly/repository/calendly.repository';
 
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -20,7 +21,7 @@ export class AuthService {
     private userRepository: UserRepository,
     private jwt: JwtService,
     private mailService: MailService,
-    @Inject('IHashAdapter') private readonly hashAdapter: IHashAdapter,
+    @Inject("IHashAdapter") private readonly hashAdapter: IHashAdapter
   ) {}
 
   async execute({ email, password, type }: InfoLoginDto) {
@@ -33,17 +34,14 @@ export class AuthService {
     await this.infoConfirm(info, type);
 
     // const passwordIsValid = await bcrypt.compare(password, info.password); * Versão antiga
-    const passwordIsValid = await this.hashAdapter.compareHash(
-      password,
-      info.password,
-    );
-
+    const passwordIsValid = await this.hashAdapter.compareHash(password, info.password);
+    
     if (!passwordIsValid) {
       await this.invalidPassword(info, type);
     }
 
     info.accessAttempt = 0;
-    info.deleted = false;
+    info.deleted = false
     if (type === 'mentor') {
       await this.mentorRepository.updateMentor(info.id, info);
     } else {

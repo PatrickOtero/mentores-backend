@@ -46,7 +46,8 @@ export class InMemoryMentorRepository {
   }
 
   async findMentorById(id: string) {
-    const mentor = this.mentors.find((mentor) => mentor.id === id);
+    const mentor = this.mentors.find(
+      (mentor) => mentor.id === id);
 
     if (!mentor) return null;
 
@@ -127,3 +128,4 @@ export class InMemoryMentorRepository {
     }
   }
 }
+

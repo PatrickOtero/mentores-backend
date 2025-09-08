@@ -85,7 +85,7 @@ export class CreateMentorDto {
 
   @IsNumber()
   @IsOptional()
-  accessAttempt?: number;
+  accessAttempt?: number
 
   @IsBoolean()
   @IsOptional()

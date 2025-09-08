@@ -29,10 +29,7 @@ describe('CreateMentorService', () => {
   });
 
   it('Should create a mentor and send a confirmation e-mail', async () => {
-    const mentorData = makeMentor({
-      email: 'mentor@example.com',
-      fullName: 'Mentor Test',
-    });
+    const mentorData = makeMentor({ email: 'mentor@example.com', fullName: 'Mentor Test' });
 
     const result = await createMentorService.execute(mentorData);
     expect(mockMailService.mentorSendCreationConfirmation).toHaveBeenCalledWith(
@@ -43,10 +40,7 @@ describe('CreateMentorService', () => {
       }),
     );
     expect(inMemoryMentorRepository.mentors.length).toEqual(1);
-    expect(result).toEqual({
-      message: 'Mentor created successfully',
-      statusCode: 201,
-    });
+    expect(result).toEqual({ message: 'Mentor created successfully', statusCode: 201 });
   });
 
   it('Should throw and error if the mentor already exists', async () => {
@@ -78,10 +72,7 @@ describe('CreateMentorService', () => {
     const result = await createMentorService.execute(mentorData);
 
     expect(inMemoryMentorRepository.mentors.length).toEqual(1);
-    expect(result).toEqual({
-      message: 'Mentor created successfully',
-      statusCode: 201,
-    });
+    expect(result).toEqual({ message: 'Mentor created successfully', statusCode: 201 });
   });
 
   it('Should throw an error if the password is not strong enough', async () => {
@@ -97,9 +88,7 @@ describe('CreateMentorService', () => {
   });
 
   it('Should throw and error if the date of birth is invalid', async () => {
-    const invalidDateData = makeMentor({
-      dateOfBirth: new Date('2090-01-01').toISOString(),
-    });
+    const invalidDateData = makeMentor({ dateOfBirth: new Date('2090-01-01').toISOString() });
 
     const mentorDto = plainToClass(CreateMentorDto, invalidDateData);
     const errors = await validate(mentorDto);
@@ -111,15 +100,12 @@ describe('CreateMentorService', () => {
   });
 
   it('Should grant that the mentor password was hashed correctly', async () => {
-    const mentorData = makeMentor({
-      email: 'hash.password@example.com',
-      password: 'Password@123',
-    });
+    const mentorData = makeMentor({ email: 'hash.password@example.com', password: 'Password@123' });
 
     const mentorDto = plainToClass(CreateMentorDto, mentorData);
     const errors = await validate(mentorDto);
 
-    console.log(errors);
+    console.log(errors)
     expect(errors.length).toBe(0);
 
     const result = await createMentorService.execute(mentorData);
@@ -127,9 +113,6 @@ describe('CreateMentorService', () => {
 
     expect(createdMentor.password).toMatch(/^\$2[ayb]\$.{56}$/);
 
-    expect(result).toEqual({
-      message: 'Mentor created successfully',
-      statusCode: 201,
-    });
+    expect(result).toEqual({ message: 'Mentor created successfully', statusCode: 201 });
   });
 });

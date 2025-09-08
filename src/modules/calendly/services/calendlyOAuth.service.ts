@@ -4,13 +4,14 @@ import { Injectable } from '@nestjs/common';
 export class InitiateOAuthService {
   async initiateOAuth(mentorId: string) {
     const params = new URLSearchParams({
-      client_id: process.env.SOUJUNIOR_CLIENT_ID,
-      redirect_uri: process.env.SOUJUNIOR_REDIRECT_URI,
+      client_id: process.env.CALENDLY_CLIENT_ID,
+      redirect_uri: process.env.CALENDLY_REDIRECT_URI,
       response_type: 'code',
+      scope: 'user:read:email scheduling:read',
       state: mentorId,
     });
-    return {
-      url: `https://auth.calendly.com/oauth/authorize?${params.toString()}`,
-    };
+
+    const url = `https://calendly.com/oauth/authorize?${params.toString()}`;
+    return { url };
   }
 }

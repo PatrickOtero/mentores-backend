@@ -1,5 +1,6 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { CalendlyRepository } from '../repository/calendly.repository';
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import { CalendlyRepository } from "../repository/calendly.repository";
+
 
 @Injectable()
 export class GetAllCalendlyMentorInfosService {
@@ -7,8 +8,7 @@ export class GetAllCalendlyMentorInfosService {
 
   async execute() {
     try {
-      const calendlyInfo =
-        await this.calendlyRepository.getAllCalendlyMentorInfos();
+      const calendlyInfo = await this.calendlyRepository.getAllCalendlyMentorInfos()
       return calendlyInfo;
     } catch (error) {
       console.error('Error returning Calendly info:', error.message);

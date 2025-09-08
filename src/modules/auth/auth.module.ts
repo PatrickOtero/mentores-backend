@@ -27,9 +27,9 @@ import { CalendlyModule } from '../calendly/calendly.module';
     AuthService,
     JwtStrategy,
     {
-      provide: 'IHashAdapter',
-      useClass: HashAdapter,
-    },
+      provide: "IHashAdapter",
+      useClass: HashAdapter
+    }
   ],
   exports: [JwtModule],
 })

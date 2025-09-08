@@ -58,18 +58,15 @@ describe('AuthService', () => {
         accessAttempt: 0,
       };
 
-      mentorRepository.findMentorByEmail = jest
-        .fn()
-        .mockResolvedValue(mockInfo);
+      mentorRepository.findMentorByEmail = jest.fn().mockResolvedValue(mockInfo);
 
-      await expect(
-        authService.infoConfirm(mockInfo, LoginTypeEnum.USER),
-      ).rejects.toThrow(
-        new HttpException(
-          { message: 'invalid e-mail or password' },
-          HttpStatus.NOT_FOUND,
-        ),
-      );
+        await expect(authService.infoConfirm(mockInfo, LoginTypeEnum.USER)).rejects.toThrow(
+          new HttpException(
+            { message: 'invalid e-mail or password' },
+            HttpStatus.NOT_FOUND,
+          ),
+        );
     });
+    
   });
 });

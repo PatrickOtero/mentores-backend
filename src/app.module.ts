@@ -1,4 +1,6 @@
-import { Module } from '@nestjs/common';
+import {
+  Module,
+} from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { PrismaService } from '../prisma/service/prisma.service';
@@ -25,6 +27,6 @@ import { ScheduleModule } from '@nestjs/schedule';
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
-  exports: [PrismaService],
+  exports: [PrismaService]
 })
 export class AppModule {}

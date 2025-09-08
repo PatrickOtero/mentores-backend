@@ -17,6 +17,7 @@ describe('AuthService', () => {
   let mailService: MailService;
   let calendlyRepository: CalendlyRepository;
 
+
   beforeEach(() => {
     mentorRepository = {
       findMentorByEmail: jest.fn(),
@@ -76,7 +77,7 @@ describe('AuthService', () => {
       mentorRepository.findMentorByEmail = jest
         .fn()
         .mockResolvedValue(mockInfo);
-      jwtService.sign = jest.fn().mockReturnValue('mocked-token');
+        jwtService.sign = jest.fn().mockReturnValue('mocked-token');
 
       const result = await authService.execute(loginData);
 
@@ -90,7 +91,7 @@ describe('AuthService', () => {
             fullName: mockInfo.fullName,
             dateOfBirth: '1990-01-01',
             specialties: mockInfo.specialties,
-            calendlyName: '',
+            calendlyName: "",
           },
         },
       });

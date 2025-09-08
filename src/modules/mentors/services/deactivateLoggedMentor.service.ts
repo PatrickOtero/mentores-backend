@@ -7,24 +7,39 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class DeactivateLoggedMentorService {
-  constructor(private mentorRepository: MentorRepository) {}
+  private readonly logger = new Logger(DeactivateLoggedMentorService.name);
+  private readonly SECOND_NOTICE_DAYS = 15;
+  private readonly THIRD_NOTICE_DAYS = 28;
 
-  async execute(id: string): Promise<{ message: string }> {
-    const mentorExists = await this.mentorRepository.findMentorById(id);
+  constructor(
+    private mentorRepository: MentorRepository,
+    private mailService: MailService,
+  ) {}
 
-    if (!mentorExists) {
-      return {
-        message: 'Mentor not found',
-      };
-    }
+  async execute(mentor: MentorEntity): Promise<{ message: string }> {
+    try {
+      const mentorExists = await this.mentorRepository.findMentorById(
+        mentor.id,
+      );
 
-    if (mentorExists.deleted) {
-      return {
-        message: 'This mentor is already deleted',
-      };
-    }
+      if (!mentorExists) {
+        throw new Error('Mentor not found');
+      }
 
-    await this.mentorRepository.deactivateMentorById(id);
+      await this.mentorRepository.deactivateMentorById(mentor.id);
+      await this.mentorRepository.updateMentor(mentor.id, { deactivatedDays: 0});
+
+      try {
+        await this.mailService.mentorSendFirstDeactivationNotice(mentor);
+        this.logger.log(
+          `Primeira notificação enviada com sucesso para mentor ${mentor.id}`,
+        );
+      } catch (emailError) {
+        this.logger.error(
+          `Falha ao enviar a primeira notificação para mentor ${mentor.id}:`,
+          emailError,
+        );
+      }
 
       return { message: 'Account deactivated successfully' };
     } catch (error) {

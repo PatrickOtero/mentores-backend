@@ -168,7 +168,7 @@ export class UpdateMentorDto {
   @ApiProperty({
     description: "Days of mentor's account deactivation.",
   })
-  deactivatedDays?: number;
+  deactivatedDays?: number
 
   @IsOptional()
   file?: any;

@@ -6,6 +6,7 @@ import { MentorRepository } from '../../repository/mentor.repository';
 import { MentorEntity } from '../../entities/mentor.entity';
 import { MentorChangePassDto } from '../../dtos/mentor-change-pass.dto';
 
+
 let changeMentorPasswordService: ChangeMentorPasswordService;
 let inMemoryMentorRepository: InMemoryMentorRepository;
 
@@ -19,14 +20,12 @@ describe('ChangeMentorPasswordService', () => {
   });
 
   it('Should change the mentor password successfully', async () => {
-    const mentor: MentorEntity = await inMemoryMentorRepository.createNewMentor(
-      {
-        email: 'mentor@example.com',
-        fullName: 'Test Mentor',
-        dateOfBirth: new Date('1990-01-01'),
-        password: await bcrypt.hash('OldPass@123', 10),
-      },
-    );
+    const mentor: MentorEntity = await inMemoryMentorRepository.createNewMentor({
+      email: 'mentor@example.com',
+      fullName: 'Test Mentor',
+      dateOfBirth: new Date('1990-01-01'),
+      password: await bcrypt.hash('OldPass@123', 10),
+    });
 
     const dto: MentorChangePassDto = {
       oldPassword: 'OldPass@123',
@@ -51,14 +50,12 @@ describe('ChangeMentorPasswordService', () => {
   });
 
   it('Should return an error when the old password is incorrect', async () => {
-    const mentor: MentorEntity = await inMemoryMentorRepository.createNewMentor(
-      {
-        email: 'mentor@example.com',
-        fullName: 'Test Mentor',
-        dateOfBirth: new Date('1990-01-01'),
-        password: await bcrypt.hash('OldPass@123', 10),
-      },
-    );
+    const mentor: MentorEntity = await inMemoryMentorRepository.createNewMentor({
+      email: 'mentor@example.com',
+      fullName: 'Test Mentor',
+      dateOfBirth: new Date('1990-01-01'),
+      password: await bcrypt.hash('OldPass@123', 10),
+    });
 
     const dto: MentorChangePassDto = {
       oldPassword: 'WrongOldPass@123',
@@ -83,14 +80,12 @@ describe('ChangeMentorPasswordService', () => {
   });
 
   it('Should return an error when the database update fails', async () => {
-    const mentor: MentorEntity = await inMemoryMentorRepository.createNewMentor(
-      {
-        email: 'mentor@example.com',
-        fullName: 'Test Mentor',
-        dateOfBirth: new Date('1990-01-01'),
-        password: await bcrypt.hash('OldPass@123', 10),
-      },
-    );
+    const mentor: MentorEntity = await inMemoryMentorRepository.createNewMentor({
+      email: 'mentor@example.com',
+      fullName: 'Test Mentor',
+      dateOfBirth: new Date('1990-01-01'),
+      password: await bcrypt.hash('OldPass@123', 10),
+    });
 
     const dto: MentorChangePassDto = {
       oldPassword: 'OldPass@123',
@@ -98,11 +93,9 @@ describe('ChangeMentorPasswordService', () => {
       confirmPassword: 'NewPass@123',
     };
 
-    vi.spyOn(inMemoryMentorRepository, 'updateMentor').mockImplementation(
-      () => {
-        throw new Error('Database error');
-      },
-    );
+    vi.spyOn(inMemoryMentorRepository, 'updateMentor').mockImplementation(() => {
+      throw new Error('Database error');
+    });
 
     const result = await changeMentorPasswordService.execute(mentor, dto);
 

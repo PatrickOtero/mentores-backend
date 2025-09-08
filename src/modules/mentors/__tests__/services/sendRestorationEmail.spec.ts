@@ -5,6 +5,7 @@ import { MailService } from 'src/modules/mails/mail.service';
 import { GenerateCodeUtil } from 'src/shared/utils/generate-code.util';
 import { MentorRepository } from '../../repository/mentor.repository';
 
+
 let sendRestorationEmailService: SendRestorationEmailService;
 let inMemoryMentorRepository: InMemoryMentorRepository;
 let mailServiceMock: MailService;
@@ -31,14 +32,12 @@ describe('SendRestorationEmailService', () => {
       fullName: 'John Doe',
       email: 'john.doe@example.com',
       dateOfBirth: new Date('1990-01-01'),
-      password: 'anypass',
+      password: "anypass"
     });
   });
 
   it('Should return "Mentor not found" if the email does not exist in the repository', async () => {
-    const result = await sendRestorationEmailService.execute(
-      'nonexistent@example.com',
-    );
+    const result = await sendRestorationEmailService.execute('nonexistent@example.com');
 
     expect(result).toEqual({ message: 'Mentor not found' });
   });
@@ -47,9 +46,7 @@ describe('SendRestorationEmailService', () => {
     const email = 'john.doe@example.com';
     await sendRestorationEmailService.execute(email);
 
-    const updatedMentor = await inMemoryMentorRepository.findMentorByEmail(
-      email,
-    );
+    const updatedMentor = await inMemoryMentorRepository.findMentorByEmail(email);
 
     expect(generateCodeUtilMock.create).toHaveBeenCalled();
     expect(updatedMentor?.code).toBe('123456');
@@ -88,15 +85,12 @@ describe('SendRestorationEmailService', () => {
 
     await sendRestorationEmailService.execute(email);
 
-    let mentorAfterFirstCall = await inMemoryMentorRepository.findMentorByEmail(
-      email,
-    );
+    let mentorAfterFirstCall = await inMemoryMentorRepository.findMentorByEmail(email);
     expect(mentorAfterFirstCall?.code).toBe('code-1');
 
     await sendRestorationEmailService.execute(email);
 
-    const mentorAfterSecondCall =
-      await inMemoryMentorRepository.findMentorByEmail(email);
+    const mentorAfterSecondCall = await inMemoryMentorRepository.findMentorByEmail(email);
     expect(mentorAfterSecondCall?.code).toBe('code-2');
 
     expect(generateCodeUtilMock.create).toHaveBeenCalledTimes(2);

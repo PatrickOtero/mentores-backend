@@ -33,14 +33,8 @@ describe('ListAllRegisteredMentorsService', () => {
     expect(result).toHaveLength(2);
     expect(result).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({
-          fullName: 'John Doe',
-          registerComplete: true,
-        }),
-        expect.objectContaining({
-          fullName: 'Jack Johnson',
-          registerComplete: true,
-        }),
+        expect.objectContaining({ fullName: 'John Doe', registerComplete: true }),
+        expect.objectContaining({ fullName: 'Jack Johnson', registerComplete: true }),
       ]),
     );
   });

@@ -55,20 +55,20 @@ describe('Auth Controller Tests', () => {
       password: 'wrongpassword',
       type: LoginTypeEnum.USER,
     };
-
+  
     const mockError = new HttpException('Invalid credentials', 401);
-
+  
     jest.spyOn(authService, 'execute').mockRejectedValue(mockError);
-
+  
     const res = {
       status: jest.fn().mockReturnThis(),
       send: jest.fn(),
     };
-
+  
     await controller.login(loginData, res as any);
-
+  
     expect(authService.execute).toHaveBeenCalledWith(loginData);
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.send).toHaveBeenCalledWith(mockError.getResponse());
-  });
+  })
 });

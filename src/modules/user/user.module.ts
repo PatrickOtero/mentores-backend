@@ -32,7 +32,7 @@ import { NorthFlankTestMethod } from './services/northFlankTest.service';
     UserRepository,
     GenerateCodeUtil,
     FileUploadService,
-    NorthFlankTestMethod,
+    NorthFlankTestMethod
   ],
   exports: [UserRepository],
 })

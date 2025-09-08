@@ -6,7 +6,7 @@ export class NorthFlankTestMethod {
   async execute(): Promise<any> {
     return {
       status: 200,
-      data: 'O teste deu certo!',
-    };
+      data: "O teste deu certo!",
+    }
   }
 }
