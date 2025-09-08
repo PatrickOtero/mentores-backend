@@ -68,10 +68,7 @@ export class MentorController {
     private uploadProfileImageService: UploadProfileImageService,
     private finishMentorRegisterService: FinishMentorRegisterService,
     private getRegisteredMentorsService: ListAllRegisteredMentorsService,
-<<<<<<< HEAD
-=======
     private resendConfirmationEmailService: ResendConfirmationEmailService,
->>>>>>> 092092cf4f70d6a9ee0b7a315dca72df6c80b3ee
   ) {}
 
   @Post()

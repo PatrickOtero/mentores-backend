@@ -16,50 +16,28 @@
 //     vi.restoreAllMocks();
 //   });
 
-<<<<<<< HEAD
-  it('should deactivate a mentor successfully', async () => {
-    const mentor: MentorEntity = await inMemoryMentorRepository.createNewMentor(
-      {
-        email: 'mentor@example.com',
-        fullName: 'Test Mentor',
-        dateOfBirth: new Date('1990-01-01'),
-        password: 'hashed-password',
-      },
-    );
+  // it('should deactivate a mentor successfully', async () => {
+  //   const mentor: MentorEntity = await inMemoryMentorRepository.createNewMentor(
+  //     {
+  //       email: 'mentor@example.com',
+  //       fullName: 'Test Mentor',
+  //       dateOfBirth: new Date('1990-01-01'),
+  //       password: 'hashed-password',
+  //     },
+  //   );
 
-    await new Promise((resolve) => setTimeout(resolve, 10));
+  //   await new Promise((resolve) => setTimeout(resolve, 10));
 
-    const response = await deactivateLoggedMentorService.execute(mentor.id);
+  //   const response = await deactivateLoggedMentorService.execute(mentor.id);
 
-    expect(response.message).toBe('Mentor deactivated successfully');
+  //   expect(response.message).toBe('Mentor deactivated successfully');
 
-    const deactivatedMentor = await inMemoryMentorRepository.findMentorById(
-      mentor.id,
-    );
+  //   const deactivatedMentor = await inMemoryMentorRepository.findMentorById(
+  //     mentor.id,
+  //   );
 
-    expect(deactivatedMentor?.deleted).toBe(true);
-  });
-=======
-//   it('should deactivate a mentor successfully', async () => {
-//     const mentor: MentorEntity = await inMemoryMentorRepository.createNewMentor({
-//       email: 'mentor@example.com',
-//       fullName: 'Test Mentor',
-//       dateOfBirth: new Date('1990-01-01'),
-//       password: 'hashed-password',
-//     });
-  
-//     await new Promise((resolve) => setTimeout(resolve, 10));
-  
-//     const response = await deactivateLoggedMentorService.execute(mentor.id);
-  
-//     expect(response.message).toBe('Mentor deactivated successfully');
-  
-//     const deactivatedMentor = await inMemoryMentorRepository.findMentorById(mentor.id);
-  
-//     expect(deactivatedMentor?.deleted).toBe(true);
-//   });
-  
->>>>>>> 092092cf4f70d6a9ee0b7a315dca72df6c80b3ee
+  //   expect(deactivatedMentor?.deleted).toBe(true);
+  // });
 
 //   it('should return a message if the mentor does not exist', async () => {
 //     const nonExistentId = '999';
@@ -69,25 +47,15 @@
 //     expect(response.message).toBe('Mentor not found');
 //   });
 
-<<<<<<< HEAD
-  it('should return a message if the mentor is already deleted', async () => {
-    const mentor: MentorEntity = await inMemoryMentorRepository.createNewMentor(
-      {
-        email: 'mentor@example.com',
-        fullName: 'Test Mentor',
-        dateOfBirth: new Date('1990-01-01'),
-        password: 'hashed-password',
-      },
-    );
-=======
-//   it('should return a message if the mentor is already deleted', async () => {
-//     const mentor: MentorEntity = await inMemoryMentorRepository.createNewMentor({
-//       email: 'mentor@example.com',
-//       fullName: 'Test Mentor',
-//       dateOfBirth: new Date('1990-01-01'),
-//       password: 'hashed-password',
-//     });
->>>>>>> 092092cf4f70d6a9ee0b7a315dca72df6c80b3ee
+  // it('should return a message if the mentor is already deleted', async () => {
+  //   const mentor: MentorEntity = await inMemoryMentorRepository.createNewMentor(
+  //     {
+  //       email: 'mentor@example.com',
+  //       fullName: 'Test Mentor',
+  //       dateOfBirth: new Date('1990-01-01'),
+  //       password: 'hashed-password',
+  //     },
+  //   );
 
 //     await inMemoryMentorRepository.deactivateMentorById(mentor.id);
 

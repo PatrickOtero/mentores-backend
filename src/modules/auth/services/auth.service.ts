@@ -43,7 +43,7 @@ export class AuthService {
     }
 
     info.accessAttempt = 0;
-    info.deleted = false
+    info.deleted = false;
     if (type === 'mentor') {
       await this.mentorRepository.updateMentor(info.id, info);
     } else {

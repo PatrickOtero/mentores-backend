@@ -57,9 +57,9 @@ describe('Auth Controller Tests', () => {
     };
 
     const res = {
-        status: jest.fn().mockReturnThis(),
-        send: jest.fn(),
-      };
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
+    };
 
     const mockInfo: InfoEntity = {
       id: '1',

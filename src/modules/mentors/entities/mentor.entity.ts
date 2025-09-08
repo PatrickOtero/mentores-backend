@@ -17,8 +17,4 @@ export class MentorEntity {
   createdAt?: string | Date;
   updatedAt?: string | Date;
   deleted?: boolean;
-<<<<<<< HEAD
-=======
-  deactivatedDays?: number;
->>>>>>> 092092cf4f70d6a9ee0b7a315dca72df6c80b3ee
 }

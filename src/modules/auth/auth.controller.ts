@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Res, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { SwaggerLogged } from '../../shared/Swagger/decorators/auth/logged.swagger.decorator';
@@ -20,7 +20,7 @@ export class AuthController {
   async login(@Body() loginData: InfoLoginDto, @Res() res: Response) {
     try {
       const { status, data } = await this.authService.execute(loginData);
-      
+
       return res.status(status).send(data);
     } catch (error) {
       if (error instanceof HttpException) {

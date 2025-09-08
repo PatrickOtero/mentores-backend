@@ -18,7 +18,6 @@ describe('AuthService', () => {
   let mailService: MailService;
   let calendlyRepository: CalendlyRepository;
 
-
   beforeEach(() => {
     mentorRepository = {
       findMentorByEmail: jest.fn(),
