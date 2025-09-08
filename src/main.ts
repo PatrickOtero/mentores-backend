@@ -11,8 +11,8 @@ async function bootstrap() {
 
   app.enableCors({
     origin: [
-    process.env.URL_ORIGIN_VERCEL,
-    process.env.URL_ORIGIN_PROD,
+    process.env.LOCAL_FRONTEND_URL,
+    process.env.REMOTE_FRONTEND_URL,
   ],
     credentials: true,
   });
