@@ -10,6 +10,7 @@ import { MailModule } from './modules/mails/mail.module';
 import { TestimonyModule } from './modules/testimony/testimony.module';
 import { MentorModule } from './modules/mentors/mentor.module';
 import { CalendlyModule } from './modules/calendly/calendly.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { CalendlyModule } from './modules/calendly/calendly.module';
     MailModule,
     TestimonyModule,
     CalendlyModule,
+    ScheduleModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

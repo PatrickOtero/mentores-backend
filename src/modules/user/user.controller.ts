@@ -40,6 +40,7 @@ import { UploadProfileImageService } from './services/uploadProfileImage.service
 import { SendRestorationEmailService } from './services/sendRestorationEmail.service';
 import { SwaggerUploadProfileImage } from '../../shared/Swagger/decorators/uploadProfileImage.swagger';
 import { SwaggerCreateUser } from '../../shared/Swagger/decorators/user/create-user.swagger.decorator';
+import { NorthFlankTestMethod } from './services/northFlankTest.service';
 
 @ApiTags('user')
 @Controller('user')
@@ -54,6 +55,7 @@ export class UserController {
     private sendRestorationEmailService: SendRestorationEmailService,
     private updateUserService: UpdateUserService,
     private uploadProfileImageService: UploadProfileImageService,
+    private northFlankTestMethod: NorthFlankTestMethod
   ) {}
 
   @Post()
@@ -125,5 +127,10 @@ export class UserController {
     @Body() passData: UserPassConfirmationDto,
   ) {
     return this.redefineUserPasswordService.execute(queryData, passData);
+  }
+
+  @Get('northflank/test')
+  async northFlankTest() {
+    return this.northFlankTestMethod.execute();
   }
 }

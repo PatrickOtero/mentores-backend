@@ -1,8 +1,16 @@
+<<<<<<< HEAD
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { PrismaService } from 'prisma/service/prisma.service';
 import { AppModule } from 'src/app.module';
 import request from 'supertest';
+=======
+import { INestApplication } from "@nestjs/common";
+import { Test } from "@nestjs/testing";
+import { PrismaService } from "../prisma/service/prisma.service";
+import { AppModule } from "src/app.module";
+import request from "supertest"
+>>>>>>> 092092cf4f70d6a9ee0b7a315dca72df6c80b3ee
 
 describe('Fetch mentors (E2E)', () => {
   let app: INestApplication;

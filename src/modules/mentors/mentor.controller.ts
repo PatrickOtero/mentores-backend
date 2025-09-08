@@ -49,6 +49,7 @@ import { SwaggerCompleteRegister } from '../../shared/Swagger/decorators/complet
 import { SwaggerChangePassword } from '../../shared/Swagger/decorators/change-password.swagger';
 import { SwaggerUploadProfileImage } from '../../shared/Swagger/decorators/uploadProfileImage.swagger';
 import { ListAllRegisteredMentorsService } from './services/listAllRegisteredMentors.service';
+import { ResendConfirmationEmailService } from './services/resendConfirmationEmail.service';
 
 @ApiTags('mentor')
 @Controller('mentor')
@@ -67,6 +68,10 @@ export class MentorController {
     private uploadProfileImageService: UploadProfileImageService,
     private finishMentorRegisterService: FinishMentorRegisterService,
     private getRegisteredMentorsService: ListAllRegisteredMentorsService,
+<<<<<<< HEAD
+=======
+    private resendConfirmationEmailService: ResendConfirmationEmailService,
+>>>>>>> 092092cf4f70d6a9ee0b7a315dca72df6c80b3ee
   ) {}
 
   @Post()
@@ -174,9 +179,10 @@ export class MentorController {
   }
 
   @ApiExcludeEndpoint()
-  @Patch(':id')
-  async deactivateEntity(@Param() { id }: GetByIdDto) {
-    return this.deactivateLoggedMentorService.execute(id);
+  @UseGuards(AuthGuard())
+  @Patch()
+  async deactivateLoggedEntity(@LoggedEntity() mentor: MentorEntity) {
+    return this.deactivateLoggedMentorService.execute(mentor);
   }
 
   @SwaggerRestoreAccountEmail()
@@ -204,5 +210,10 @@ export class MentorController {
     } catch (error) {
       console.log(error.message);
     }
+  }
+
+  @Post('resend-confirmation-email')
+  async resendConfirmationEmail(@Body() data: SearchByEmailDto) {
+    return this.resendConfirmationEmailService.execute(data.email);
   }
 }
