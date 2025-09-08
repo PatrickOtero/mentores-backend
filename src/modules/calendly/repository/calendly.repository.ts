@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "prisma/service/prisma.service";
+import { PrismaService } from "../../../../prisma/service/prisma.service";
 import { CreateCalendlyInfoDto, UpdateCalendlyInfoDto } from "../dto/calendly-info-dto";
 
 @Injectable()

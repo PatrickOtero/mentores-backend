@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
 import { MailService } from '../../../modules/mails/mail.service';
 import { MentorRepository } from '../../../modules/mentors/repository/mentor.repository';
 import { UserRepository } from '../../../modules/user/user.repository';
@@ -12,7 +11,6 @@ import { accessAttemptMessage } from '../enums/message.enum';
 
 import IHashAdapter from 'src/lib/adapter/hash/hashAdapterInterface';
 import { CalendlyRepository } from '../../../modules/calendly/repository/calendly.repository';
-
 
 
 @Injectable()
@@ -30,7 +28,6 @@ export class AuthService {
     let info: InfoEntity;
     if (type === 'mentor') {
       info = await this.mentorRepository.findMentorByEmail(email);
-      
     } else {
       info = await this.userRepository.findUserByEmail(email);
     }
@@ -44,20 +41,21 @@ export class AuthService {
     }
 
     info.accessAttempt = 0;
+    info.deleted = false
     if (type === 'mentor') {
       await this.mentorRepository.updateMentor(info.id, info);
     } else {
       await this.userRepository.updateUser(info.id, info);
     }
 
-    const calendlyMentorData = await this.calendlyRepository.getCalendlyInfoByMentorId(info.id)
+    const calendlyMentorData =
+      await this.calendlyRepository.getCalendlyInfoByMentorId(info.id);
 
     if (!calendlyMentorData) {
-      info.calendlyName = ""
+      info.calendlyName = '';
     } else {
-      info.calendlyName = calendlyMentorData.calendlyName
+      info.calendlyName = calendlyMentorData.calendlyName;
     }
-
 
     delete info.password;
     delete info.code;
@@ -75,17 +73,21 @@ export class AuthService {
   }
 
   async infoConfirm(info: InfoEntity, type: string) {
-    if (!info || info.deleted == true) {
+    if (!info || (info.deleted == true && info.deactivatedDays > 30)) {
       const message = 'invalid e-mail or password';
       throw new HttpException({ message }, HttpStatus.NOT_FOUND);
     }
 
     if (!info.emailConfirmed) {
+      const message =
+        'Your account is not activated yet. Check your e-mail inbox for instructions';
 
-      const message = 'Your account is not activated yet. Check your e-mail inbox for instructions'
-
-      if(type == 'mentor') await this.mailService.mentorSendCreationConfirmation(info as MentorEntity)
-      if(type == 'user') await this.mailService.userSendCreationConfirmation(info as UserEntity)
+      if (type == 'mentor')
+        await this.mailService.mentorSendCreationConfirmation(
+          info as MentorEntity,
+        );
+      if (type == 'user')
+        await this.mailService.userSendCreationConfirmation(info as UserEntity);
 
       throw new HttpException({ message }, HttpStatus.NOT_FOUND);
     }
