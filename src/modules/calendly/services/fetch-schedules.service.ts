@@ -6,18 +6,22 @@ import { IHttpAdapter } from '../../../lib/adapter/httpAdapterInterface';
 export class FetchSchedulesService {
   constructor(
     private readonly calendlyRepository: CalendlyRepository,
-    @Inject('IHttpAdapter') private readonly httpAdapter: IHttpAdapter
+    @Inject('IHttpAdapter') private readonly httpAdapter: IHttpAdapter,
   ) {}
 
   async getMentorSchedules(mentorId: string) {
-    const calendlyInfo = await this.calendlyRepository.getCalendlyInfoByMentorId(mentorId);
+    const calendlyInfo =
+      await this.calendlyRepository.getCalendlyInfoByMentorId(mentorId);
 
     if (!calendlyInfo || !calendlyInfo.calendlyAccessToken) {
       throw new Error('Mentor not connected to Calendly');
     }
 
     if (!calendlyInfo.calendlyUserUuid) {
-      calendlyInfo.calendlyUserUuid = await this.fetchAndSaveMentorUuid(mentorId, calendlyInfo.calendlyAccessToken);
+      calendlyInfo.calendlyUserUuid = await this.fetchAndSaveMentorUuid(
+        mentorId,
+        calendlyInfo.calendlyAccessToken,
+      );
     }
 
     const userUrlUuid = `https://api.calendly.com/users/${calendlyInfo.calendlyUserUuid}`;
@@ -28,10 +32,13 @@ export class FetchSchedulesService {
           headers: {
             Authorization: `Bearer ${calendlyInfo.calendlyAccessToken}`,
           },
-        }
+        },
       );
 
-      const filteredEvents = await this.extractRelevantEventData(eventsResponse.collection, calendlyInfo.calendlyAccessToken);
+      const filteredEvents = await this.extractRelevantEventData(
+        eventsResponse.collection,
+        calendlyInfo.calendlyAccessToken,
+      );
       return filteredEvents;
     } catch (error: any) {
       console.error('Error fetching scheduled events:', error.response?.data);
@@ -39,7 +46,10 @@ export class FetchSchedulesService {
     }
   }
 
-  private async fetchAndSaveMentorUuid(mentorId: string, accessToken: string): Promise<string> {
+  private async fetchAndSaveMentorUuid(
+    mentorId: string,
+    accessToken: string,
+  ): Promise<string> {
     try {
       const response = await this.httpAdapter.get('/users/me', {
         headers: {
@@ -48,7 +58,9 @@ export class FetchSchedulesService {
       });
 
       const mentorUuid = response.resource.uri.split('/').pop();
-      await this.calendlyRepository.updateCalendlyInfo(mentorId, { calendlyUserUuid: mentorUuid });
+      await this.calendlyRepository.updateCalendlyInfo(mentorId, {
+        calendlyUserUuid: mentorUuid,
+      });
       return mentorUuid;
     } catch (error: any) {
       console.error('Error fetching mentor UUID:', error.response?.data);
@@ -56,27 +68,33 @@ export class FetchSchedulesService {
     }
   }
 
-  private async extractRelevantEventData(events: any[], accessToken: string): Promise<any[]> {
+  private async extractRelevantEventData(
+    events: any[],
+    accessToken: string,
+  ): Promise<any[]> {
     const eventDetails = [];
-  
+
     for (const event of events) {
-      const inviteesResponse = await this.httpAdapter.get(`${event.uri}/invitees`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
+      const inviteesResponse = await this.httpAdapter.get(
+        `${event.uri}/invitees`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
         },
-      });
+      );
 
       const eventId = event.uri.split('/').pop();
-  
-      const participants = inviteesResponse.collection.map(invitee => ({
+
+      const participants = inviteesResponse.collection.map((invitee) => ({
         name: invitee.name,
         email: invitee.email,
-        questions: invitee.questions_and_answers.map(qa => ({
+        questions: invitee.questions_and_answers.map((qa) => ({
           question: qa.question,
           answer: qa.answer,
         })),
       }));
-  
+
       eventDetails.push({
         eventName: event.name,
         description: event.description || 'No description provided',
@@ -85,15 +103,16 @@ export class FetchSchedulesService {
         duration: this.calculateDuration(event.start_time, event.end_time),
         joinUrl: event.location?.join_url || 'No meeting link provided',
         eventUrl: `https://calendly.com/app/scheduled_events/user/me?period=upcoming&uuid=${eventId}`,
-        participants
+        participants,
       });
     }
-  
+
     return eventDetails;
   }
 
   private calculateDuration(startTime: string, endTime: string): string {
-    const durationMs = new Date(endTime).getTime() - new Date(startTime).getTime();
+    const durationMs =
+      new Date(endTime).getTime() - new Date(startTime).getTime();
     const minutes = Math.floor(durationMs / (1000 * 60));
     return `${minutes} minutes`;
   }

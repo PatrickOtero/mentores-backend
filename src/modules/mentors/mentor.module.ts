@@ -12,7 +12,7 @@ import { GetMentorByIdService } from './services/getMentorById.service';
 import { GetMentorByNameAndRoleService } from './services/getMentorByNameAndRole.service';
 import { ActivateMentorService } from './services/activateMentor.service';
 import { ChangeMentorPasswordService } from './services/changeMentorPassword.service';
-import { DeactivateLoggedMentorService} from './services/deactivateLoggedMentor.service';
+import { DeactivateLoggedMentorService } from './services/deactivateLoggedMentor.service';
 import { FinishMentorRegisterService } from './services/finishMentorRegisterService.service';
 import { RedefineMentorPasswordService } from './services/redefineMentorPassword.service';
 import { SendRestorationEmailService } from './services/sendRestorationEmail.service';

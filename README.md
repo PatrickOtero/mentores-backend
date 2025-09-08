@@ -4,8 +4,7 @@ Projeto Opensource que visa melhorar o match entre Mentores e Juniors.
 
 ## Observação:
 
->Antes de iniciar a instalação, lembre-se de fazer um fork do repositório oficial e realizar as alterações no repositório "forkado" enviando modificações através de Pull Requests. Nunca modifique diretamente o repositório oficial.
-
+> Antes de iniciar a instalação, lembre-se de fazer um fork do repositório oficial e realizar as alterações no repositório "forkado" enviando modificações através de Pull Requests. Nunca modifique diretamente o repositório oficial.
 
 Clone o projeto:
 
@@ -60,14 +59,13 @@ Caso você tenha feito isso tudo e não recebeu o email no mailtrap faça o segu
 
 src/modules/mails/mail.module.ts
 
-dentro dela tem um: 
+dentro dela tem um:
 
 ```bash
 secure: true,
 ```
 
 ![image](https://github.com/wendesongomes/mentores-backend/assets/82889172/0386598d-5053-4189-9e9b-e7d1a4ef1655)
-
 
 troque para false, com isso o mailtrap vai capturar seus emails normalmente.
 
@@ -89,9 +87,9 @@ sequenceDiagram
     Dev->>Git: Abre Pull Request (PR) para main
     Git->>Actions: Novo Evento: PR criada
     Actions-->>Git: Cria imagem Docker
-    
+
     Note over Dev,ECR: Loop de desenvolvimento
-    
+
     Dev->>Git: Aprova e mergeia PR para main
     Git->>Actions: Novo Evento: Branch main atualizada
     activate Actions

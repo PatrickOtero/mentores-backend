@@ -2,7 +2,7 @@ name: Docker Image CI for AWS
 
 on:
   push:
-    branches: ["main"]
+    branches: ['main']
     paths-ignore:
       - '**/*.md'
 

@@ -28,7 +28,6 @@ export class CreateCalendlyInfoDto {
   @IsNotEmpty()
   @IsString()
   agendaName: string;
-
 }
 
 export class UpdateCalendlyInfoDto {

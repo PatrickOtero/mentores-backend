@@ -66,28 +66,28 @@ export class MentorController {
     private updateMentorService: UpdateMentorService,
     private uploadProfileImageService: UploadProfileImageService,
     private finishMentorRegisterService: FinishMentorRegisterService,
-    private getRegisteredMentorsService: ListAllRegisteredMentorsService
+    private getRegisteredMentorsService: ListAllRegisteredMentorsService,
   ) {}
 
   @Post()
   @SwaggerCreateMentor()
   async createMentor(
     @Body() createMentorDto: CreateMentorDto,
-    @Res() res: Response
-   ) {
-    const { message, statusCode } = await this.createMentorService.execute(createMentorDto);
+    @Res() res: Response,
+  ) {
+    const { message, statusCode } = await this.createMentorService.execute(
+      createMentorDto,
+    );
 
-    return res.json({message: message}).status(statusCode)
+    return res.json({ message: message }).status(statusCode);
   }
 
   @ApiExcludeEndpoint()
   @Get()
-  async getAllMentors(
-    @Res() res: Response
-  ) {
+  async getAllMentors(@Res() res: Response) {
     const mentorsList = await this.listAllMentorsService.execute();
 
-    return res.json(mentorsList).status(200)
+    return res.json(mentorsList).status(200);
   }
 
   @Get('registered')

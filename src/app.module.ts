@@ -1,6 +1,4 @@
-import {
-  Module,
-} from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { PrismaService } from '../prisma/service/prisma.service';
@@ -25,6 +23,6 @@ import { CalendlyModule } from './modules/calendly/calendly.module';
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
-  exports: [PrismaService]
+  exports: [PrismaService],
 })
 export class AppModule {}

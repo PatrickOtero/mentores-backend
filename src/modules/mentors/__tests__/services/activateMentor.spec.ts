@@ -4,14 +4,15 @@ import { ActivateMentorService } from '../../services/activateMentor.service';
 import { MentorRepository } from '../../repository/mentor.repository';
 import { ActivateMentorDto } from '../../dtos/activate-mentor.dto';
 
-
 let inMemoryMentorRepository: InMemoryMentorRepository;
 let activateMentorService: ActivateMentorService;
 
 describe('ActivateMentorService', () => {
   beforeEach(() => {
     inMemoryMentorRepository = new InMemoryMentorRepository();
-    activateMentorService = new ActivateMentorService(inMemoryMentorRepository as unknown as MentorRepository);
+    activateMentorService = new ActivateMentorService(
+      inMemoryMentorRepository as unknown as MentorRepository,
+    );
   });
 
   it('Should activate a mentor with correct code and email', async () => {
@@ -35,7 +36,9 @@ describe('ActivateMentorService', () => {
     expect(result.status).toBe(200);
     expect(result.data.message).toBe('Email confirmed successfully');
 
-    const updatedMentor = await inMemoryMentorRepository.findMentorByEmail('mentor@example.com');
+    const updatedMentor = await inMemoryMentorRepository.findMentorByEmail(
+      'mentor@example.com',
+    );
 
     expect(updatedMentor?.emailConfirmed).toBe(true);
     expect(updatedMentor?.code).toBeNull();
@@ -62,7 +65,9 @@ describe('ActivateMentorService', () => {
     expect(result.status).toBe(404);
     expect(result.data.message).toBe('Mentor not found');
 
-    const updatedMentor = await inMemoryMentorRepository.findMentorByEmail('mentor@example.com');
+    const updatedMentor = await inMemoryMentorRepository.findMentorByEmail(
+      'mentor@example.com',
+    );
 
     expect(updatedMentor?.emailConfirmed).toBeFalsy();
     expect(updatedMentor?.code).toBe('123456');

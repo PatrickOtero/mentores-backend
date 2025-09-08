@@ -13,5 +13,5 @@ export class InfoEntity {
   profileKey?: string;
   specialties?: string[];
   updatedAt?: string | Date;
-  calendlyName?: string
+  calendlyName?: string;
 }
