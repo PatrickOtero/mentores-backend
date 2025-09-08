@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { MentorRepository } from '../repository/mentor.repository';
 import { MailService } from "../../mails/mail.service";
+import { th } from "@faker-js/faker/.";
 
 @Injectable()
 export class ResendConfirmationEmailService {
@@ -21,6 +22,6 @@ export class ResendConfirmationEmailService {
         
         await this.mailService.mentorSendCreationConfirmation(mentor);
 
-        return { message: 'Email de confirmação reenviado com sucesso!' }
+        throw new HttpException('E-mail de confirmação reenviado com sucesso', HttpStatus.OK);
     }
 }

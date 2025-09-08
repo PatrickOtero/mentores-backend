@@ -18,4 +18,5 @@ export class MentorEntity {
   updatedAt?: string | Date;
   deleted?: boolean;
   deactivatedDays?: number;
+  deactivatedAt?: Date | null | string; // Estou na dúvida se realmente precisa do string aqui, preciso tirar essa dúvida
 }

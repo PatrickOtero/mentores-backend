@@ -30,6 +30,7 @@ model mentors {
   deactivatedDays  Int            @default(0)
   testimony        testimony?
   calendlyInfo     calendlyInfo?  @relation("MentorCalendlyInfo")
+  deactivatedAt DateTime? 
 
   @@index([id])
 }
@@ -44,7 +45,7 @@ model calendlyInfo {
   calendlyName        String?
   agendaName          String?
 
-  mentor              mentors?   @relation("MentorCalendlyInfo", fields: [mentorId], references: [id])
+  mentor              mentors?   @relation("MentorCalendlyInfo", fields: [mentorId], references: [id],onDelete: Cascade )
 }
 
 model users {
