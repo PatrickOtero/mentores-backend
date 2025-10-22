@@ -13,6 +13,7 @@ import { TestimonyModule } from './modules/testimony/testimony.module';
 import { MentorModule } from './modules/mentors/mentor.module';
 import { CalendlyModule } from './modules/calendly/calendly.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AccountDeletionFeedbackModule } from './modules/account-deletion-feedback/account-deletion-feedback.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     TestimonyModule,
     CalendlyModule,
     ScheduleModule,
+    AccountDeletionFeedbackModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

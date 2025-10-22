@@ -1,4 +1,3 @@
-
 import { MailService } from 'src/modules/mails/mail.service';
 import { MentorRepository } from '../repository/mentor.repository';
 import { Injectable, Logger } from '@nestjs/common';
@@ -6,8 +5,8 @@ import { MentorEntity } from '../entities/mentor.entity';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
-export class DeactivateLoggedMentorService {
-  private readonly logger = new Logger(DeactivateLoggedMentorService.name);
+export class DeleteMentorService {
+  private readonly logger = new Logger(DeleteMentorService.name);
   private readonly SECOND_NOTICE_DAYS = 15;
   private readonly THIRD_NOTICE_DAYS = 28;
 

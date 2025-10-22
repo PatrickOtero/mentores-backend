@@ -34,8 +34,9 @@ services:
     environment:
       DATABASE_URL: postgresql://docker:ignite@database_soujunior:5432/mentores_backend
     command: >
-      sh -c "npx prisma migrate deploy &&
-             npm run start:prod"
+      sh -c "npx prisma generate &&
+            npx prisma migrate deploy &&
+            npm run start:prod"
 
 volumes:
   pgdata:

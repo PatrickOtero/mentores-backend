@@ -8,7 +8,6 @@ import { MentorEntity } from '../entities/mentor.entity';
 @Injectable()
 export class MentorRepository extends PrismaClient {
   async findDeactivatedMentors(): Promise<MentorEntity[]> {
-    // achar os mentores desativados
     return this.mentors
       .findMany({
         where: {

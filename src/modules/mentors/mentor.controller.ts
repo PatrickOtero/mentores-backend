@@ -36,7 +36,7 @@ import { MentorChangePassDto } from './dtos/mentor-change-pass.dto';
 import { ActivateMentorService } from './services/activateMentor.service';
 import { ChangeMentorPasswordService } from './services/changeMentorPassword.service';
 import { CreateMentorService } from './services/createMentor.service';
-import { DeactivateLoggedMentorService } from './services/deactivateLoggedMentor.service';
+import { DeleteMentorService } from './services/deleteMentor.service';
 import { GetMentorByIdService } from './services/getMentorById.service';
 import { GetMentorByNameAndRoleService } from './services/getMentorByNameAndRole.service';
 import { ListAllMentorsService } from './services/listAllMentors.service';
@@ -57,7 +57,7 @@ export class MentorController {
     private activateMentorService: ActivateMentorService,
     private changeMentorPasswordService: ChangeMentorPasswordService,
     private createMentorService: CreateMentorService,
-    private deactivateLoggedMentorService: DeactivateLoggedMentorService,
+    private deleteMentorService: DeleteMentorService,
     private getMentorByIdService: GetMentorByIdService,
     private getMentorByNameAndRoleService: GetMentorByNameAndRoleService,
     private listAllMentorsService: ListAllMentorsService,
@@ -175,9 +175,11 @@ export class MentorController {
 
   @ApiExcludeEndpoint()
   @UseGuards(AuthGuard())
-  @Patch()
-  async deactivateLoggedEntity(@LoggedEntity() mentor: MentorEntity) {
-    return this.deactivateLoggedMentorService.execute(mentor);
+  @Patch("delete-mentor")
+  async deleteMentor(
+    @LoggedEntity() mentor: MentorEntity
+  ) {
+    return this.deleteMentorService.execute(mentor);
   }
 
   @SwaggerRestoreAccountEmail()
