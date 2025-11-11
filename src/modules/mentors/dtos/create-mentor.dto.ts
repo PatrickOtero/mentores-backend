@@ -21,10 +21,13 @@ import { Specialties } from '../enums/specialties.enum';
 export class CreateMentorDto {
   @IsString()
   @IsNotEmpty({ message: "the 'fullName' field must not be empty" })
+  @Matches(/^[A-Za-zÀ-ÿ\s]+$/, {
+    message: 'The full name must contain only letters and spaces',
+  })
   @MaxLength(100, { message: 'Maximum of 100 characters exceeded' })
   @ApiProperty({
     required: true,
-    example: 'Fulano de tal',
+    example: 'Fulano de Tal',
   })
   fullName: string;
 

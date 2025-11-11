@@ -20,7 +20,7 @@ import { Gender } from '../enums/gender.enum';
 
 export class UpdateMentorDto {
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'Only strings are allowed in this field' })
   @IsNotEmpty({ message: "the 'fullName' field must not be empty" })
   @MaxLength(100, { message: 'Maximum of 100 characters exceeded' })
   @ApiProperty({
