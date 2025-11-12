@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Delete, Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { GenerateCodeUtil } from '../../shared/utils/generate-code.util';
 import { MailModule } from '../mails/mail.module';

@@ -25,7 +25,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
-    "prisma": "prisma"
+    "prisma": "prisma",
+    "repl": "nest start --repl"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.8.1",

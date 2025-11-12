@@ -16,120 +16,56 @@ export class DeleteMentorService {
   ) {}
 
   async execute(mentor: MentorEntity): Promise<{ message: string }> {
-    try {
-      const mentorExists = await this.mentorRepository.findMentorById(
-        mentor.id,
-      );
-
-      if (!mentorExists) {
-        throw new Error('Mentor not found');
-      }
-
-      await this.mentorRepository.deactivateMentorById(mentor.id);
-      await this.mentorRepository.updateMentor(mentor.id, { deactivatedDays: 0});
-
-      try {
-        await this.mailService.mentorSendFirstDeactivationNotice(mentor);
-        this.logger.log(
-          `Primeira notificação enviada com sucesso para mentor ${mentor.id}`,
-        );
-      } catch (emailError) {
-        this.logger.error(
-          `Falha ao enviar a primeira notificação para mentor ${mentor.id}:`,
-          emailError,
-        );
-      }
-
-      return { message: 'Account deactivated successfully' };
-    } catch (error) {
-      this.logger.error(
-        `Falha ao executar desativação para mentor ${mentor.id}`,
-        error,
-      );
-      throw error;
+    const mentorExists = await this.mentorRepository.findMentorById(mentor.id);
+    if (!mentorExists) {
+      throw new Error('Mentor not found');
     }
+
+    await this.mentorRepository.deactivateMentorById(mentor.id);
+    await this.mentorRepository.updateMentor(mentor.id, { deactivatedDays: 0 });
+    
+    await this.mailService.mentorSendFirstDeactivationNotice(mentor);
+    this.logger.log(`Primeira notificação enviada para mentor ${mentor.id}`);
+
+    return { message: 'Account deactivated successfully' };
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  @Cron(CronExpression.EVERY_DAY_AT_1AM)
   async handleDeactivationNotifications() {
-    try {
-      const now = new Date();
-      this.logger.log(
-        `Verificacao diária de notificação iniciada: ${this.formatDateTime(
-          now,
-        )}`,
-      );
+    this.logger.log('Iniciando verificação de notificações de desativação...');
 
-      const deactivatedMentors =
-        await this.mentorRepository.findDeactivatedMentors();
+    await this.sendNoticeFor(this.SECOND_NOTICE_DAYS);
+    await this.sendNoticeFor(this.THIRD_NOTICE_DAYS);
 
-      for (const mentor of deactivatedMentors) {
-        const daysSinceDeactivation = this.getDaysSinceDeactivation(
-          new Date(mentor.updatedAt),
-        );
+    this.logger.log('Verificação de notificações concluída.');
+  }
 
-        this.logger.log(
-          `Mentor ${mentor.id} - Dias desde desativação: ${daysSinceDeactivation}`,
-        );
+  private async sendNoticeFor(days: number): Promise<void> {
+    const noticeType = days === this.SECOND_NOTICE_DAYS ? 'segunda' : 'terceira';
+    this.logger.log(`Buscando mentores para ${noticeType} notificação (${days} dias).`);
 
-        await this.processNotification(mentor, daysSinceDeactivation);
-      }
-    } catch (error) {
-      this.logger.error(
-        `Erro no processo de notificação de desativacao: `,
-        error,
-      );
+    const mentorsToNotify = await this.mentorRepository.findMentorsDeactivatedFor(days);
+
+    if (mentorsToNotify.length === 0) {
+      this.logger.log(`Nenhum mentor encontrado para a ${noticeType} notificação.`);
+      return;
     }
-  }
 
-  private async processNotification(
-    mentor: MentorEntity,
-    daysSince: number,
-  ): Promise<void> {
-    try {
-      if (
-        daysSince >= this.SECOND_NOTICE_DAYS &&
-        daysSince < this.SECOND_NOTICE_DAYS + 1
-      ) {
-        this.logger.log(
-          `Enviando segunda notificação para mentor ${mentor.id}`,
-        );
-        await this.mentorRepository.updateMentor(mentor.id, { deactivatedDays: daysSince});
-        await this.mailService.mentorSendSecondDeactivationNotice(mentor);
-      }
+    this.logger.log(`${mentorsToNotify.length} mentor(es) encontrado(s).`);
 
-      if (
-        daysSince >= this.THIRD_NOTICE_DAYS &&
-        daysSince < this.THIRD_NOTICE_DAYS + 1
-      ) {
-        this.logger.log(
-          `Enviando terceira notificação para mentor ${mentor.id}`,
-        );
-        await this.mentorRepository.updateMentor(mentor.id, { deactivatedDays: daysSince});
-        await this.mailService.mentorSendThirdDeactivationNotice(mentor);
+    for (const mentor of mentorsToNotify) {
+      try {
+        if (days === this.SECOND_NOTICE_DAYS) {
+          await this.mailService.mentorSendSecondDeactivationNotice(mentor);
+        } else if (days === this.THIRD_NOTICE_DAYS) {
+          await this.mailService.mentorSendThirdDeactivationNotice(mentor);
+        }
+        
+        await this.mentorRepository.updateMentor(mentor.id, { deactivatedDays: days });
+        this.logger.log(`${noticeType.charAt(0).toUpperCase() + noticeType.slice(1)} notificação enviada para mentor ${mentor.id}`);
+      } catch (error) {
+        this.logger.error(`Falha ao enviar ${noticeType} notificação para mentor ${mentor.id}:`, error);
       }
-    } catch (error) {
-      this.logger.error(
-        `Erro ao processar notificações para mentor ${mentor.id}`,
-        error,
-      );
     }
-  }
-
-  private getDaysSinceDeactivation(deactivationDate: Date): number {
-    const now = new Date();
-    const diffTime = now.getTime() - deactivationDate.getTime();
-    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
-  }
-
-  private formatDateTime(date: Date): string {
-    return date.toLocaleString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    });
   }
 }

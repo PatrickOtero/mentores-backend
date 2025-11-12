@@ -76,10 +76,10 @@ export class MentorController {
   async createMentor(
     @Body() createMentorDto: CreateMentorDto,
     @Res() res: Response
-   ) {
+  ) {
     const { message, statusCode } = await this.createMentorService.execute(createMentorDto);
 
-    return res.json({message: message}).status(statusCode)
+    return res.json({ message: message }).status(statusCode)
   }
 
   @ApiExcludeEndpoint()
