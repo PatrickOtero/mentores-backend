@@ -82,7 +82,6 @@ export class MentorRepository extends PrismaClient {
           email: true,
           specialties: true,
           gender: true,
-          profile: true,
           aboutMe: true,
           registerComplete: true,
           deleted: true,
@@ -99,6 +98,15 @@ export class MentorRepository extends PrismaClient {
   ): Promise<MentorEntity[]> {
     const mentors = await this.mentors
       .findMany({
+        select: {
+          id: true,
+          fullName: true,
+          dateOfBirth: true,
+          email: true,
+          specialties: true,
+          gender: true,
+          aboutMe: true,
+        },
         where: {
           deleted: false,
           OR: [
@@ -115,6 +123,36 @@ export class MentorRepository extends PrismaClient {
 
     return mentors;
   }
+
+  async findMentorsBySingleQuery(query: string): Promise<MentorEntity[]> {
+  return this.mentors.findMany({
+    select: {
+      id: true,
+      fullName: true,
+      dateOfBirth: true,
+      email: true,
+      specialties: true,
+      gender: true,
+      aboutMe: true,
+    },
+    where: {
+      deleted: false,
+      OR: [
+        {
+          fullName: {
+            contains: query,
+            mode: 'insensitive',
+          },
+        },
+        {
+          specialties: {
+            has: query,
+          },
+        },
+      ],
+    },
+  });
+}
 
   async deactivateMentorById(id: string): Promise<MentorEntity> {
     return this.mentors

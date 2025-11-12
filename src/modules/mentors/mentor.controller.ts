@@ -49,6 +49,7 @@ import { SwaggerCompleteRegister } from '../../shared/Swagger/decorators/complet
 import { SwaggerChangePassword } from '../../shared/Swagger/decorators/change-password.swagger';
 import { SwaggerUploadProfileImage } from '../../shared/Swagger/decorators/uploadProfileImage.swagger';
 import { ListAllRegisteredMentorsService } from './services/listAllRegisteredMentors.service';
+import { GetMentorBySingleQueryService } from './services/getMentorBySingleQuery.service';
 
 @ApiTags('mentor')
 @Controller('mentor')
@@ -67,6 +68,7 @@ export class MentorController {
     private uploadProfileImageService: UploadProfileImageService,
     private finishMentorRegisterService: FinishMentorRegisterService,
     private getRegisteredMentorsService: ListAllRegisteredMentorsService,
+    private getMentorBySingleQueryService: GetMentorBySingleQueryService,
   ) {}
 
   @Post()
@@ -104,6 +106,19 @@ export class MentorController {
     const data = await this.getMentorByNameAndRoleService.execute(
       fullName,
       specialty,
+    );
+
+    return res.status(HttpStatus.OK).json(data);
+  }
+
+  @Get('singlequery')
+  @SwaggerGetMentor()
+  async findMentorWithSingleQuery(
+    @Res() res: Response,
+    @Query('query') query: string,
+  ) {
+    const data = await this.getMentorBySingleQueryService.execute(
+      query
     );
 
     return res.status(HttpStatus.OK).json(data);

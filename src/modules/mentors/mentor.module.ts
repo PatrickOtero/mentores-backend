@@ -20,6 +20,7 @@ import { UploadProfileImageService } from './services/uploadProfileImage.service
 import { JwtService } from '@nestjs/jwt';
 import { ListAllRegisteredMentorsService } from './services/listAllRegisteredMentors.service';
 import { ScheduleModule } from '@nestjs/schedule';
+import { GetMentorBySingleQueryService } from './services/getMentorBySingleQuery.service';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ListAllRegisteredMentorsService,
     GetMentorByIdService,
     GetMentorByNameAndRoleService,
+    GetMentorBySingleQueryService,
     ActivateMentorService,
     ChangeMentorPasswordService,
     DeleteMentorService,

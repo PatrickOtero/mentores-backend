@@ -34,11 +34,14 @@ export class CreateMentorDto {
   @Transform(({ value }) => new Date(value))
   @IsDate()
   @MaxDate(new Date(), {
-    message: 'The date must be before the current date',
+    message: 'A data deve ser anterior à data atual',
+  })
+  @MaxDate(new Date(new Date().setFullYear(new Date().getFullYear() - 18)), {
+    message: 'Você deve ter pelo menos 18 anos para se registrar',
   })
   @ApiProperty({
     required: true,
-    example: '2023-04-06',
+    example: '2000-04-06',
   })
   dateOfBirth: Date | string;
 
