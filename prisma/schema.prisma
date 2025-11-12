@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABABSE_URL_LOCAL")
+  url      = env("DATABASE_URL_LOCAL")
 }
 
 model mentors {
@@ -30,6 +30,7 @@ model mentors {
   deactivatedDays  Int            @default(0)
   testimony        testimony?
   calendlyInfo     calendlyInfo?  @relation("MentorCalendlyInfo")
+  deactivatedAt DateTime?
   accountDeletionFeedback accountDeletionFeedback?
 
   @@index([id])
