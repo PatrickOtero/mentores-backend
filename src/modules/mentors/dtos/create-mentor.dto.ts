@@ -21,21 +21,27 @@ import { Specialties } from '../enums/specialties.enum';
 export class CreateMentorDto {
   @IsString()
   @IsNotEmpty({ message: "the 'fullName' field must not be empty" })
+  @Matches(/^[A-Za-zÀ-ÿ\s]+$/, {
+    message: 'The full name must contain only letters and spaces',
+  })
   @MaxLength(100, { message: 'Maximum of 100 characters exceeded' })
   @ApiProperty({
     required: true,
-    example: 'Fulano de tal',
+    example: 'Fulano de Tal',
   })
   fullName: string;
 
   @Transform(({ value }) => new Date(value))
   @IsDate()
   @MaxDate(new Date(), {
-    message: 'The date must be before the current date',
+    message: 'A data deve ser anterior à data atual',
+  })
+  @MaxDate(new Date(new Date().setFullYear(new Date().getFullYear() - 18)), {
+    message: 'Você deve ter pelo menos 18 anos para se registrar',
   })
   @ApiProperty({
     required: true,
-    example: '2023-04-06',
+    example: '2000-04-06',
   })
   dateOfBirth: Date | string;
 
