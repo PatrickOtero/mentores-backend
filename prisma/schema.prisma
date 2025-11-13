@@ -30,7 +30,8 @@ model mentors {
   deactivatedDays  Int            @default(0)
   testimony        testimony?
   calendlyInfo     calendlyInfo?  @relation("MentorCalendlyInfo")
-  deactivatedAt DateTime? 
+  deactivatedAt DateTime?
+  accountDeletionFeedback accountDeletionFeedback?
 
   @@index([id])
 }
@@ -89,4 +90,16 @@ model testimony {
   imageUrl    String?  @default("")
   createdAt   String   @default("")
   updatedAt   String   @default("")
+}
+
+model accountDeletionFeedback {
+  id                     String   @id @default(uuid())
+  mentor                 mentors? @relation(fields: [mentor_id], references: [id])
+  mentor_id              String   @unique
+  reasonOption           String
+  reasonText             String?
+  usabilityRating        String
+  satisfactionRating     String
+  userExperienceFeedback String?
+  createdAt              DateTime @default(now())
 }

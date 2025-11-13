@@ -12,7 +12,7 @@ import { GetMentorByIdService } from './services/getMentorById.service';
 import { GetMentorByNameAndRoleService } from './services/getMentorByNameAndRole.service';
 import { ActivateMentorService } from './services/activateMentor.service';
 import { ChangeMentorPasswordService } from './services/changeMentorPassword.service';
-import { DeactivateLoggedMentorService } from './services/deactivateLoggedMentor.service';
+import { DeleteMentorService } from './services/deleteMentor.service';
 import { FinishMentorRegisterService } from './services/finishMentorRegisterService.service';
 import { RedefineMentorPasswordService } from './services/redefineMentorPassword.service';
 import { SendRestorationEmailService } from './services/sendRestorationEmail.service';
@@ -20,8 +20,7 @@ import { UploadProfileImageService } from './services/uploadProfileImage.service
 import { JwtService } from '@nestjs/jwt';
 import { ListAllRegisteredMentorsService } from './services/listAllRegisteredMentors.service';
 import { ScheduleModule } from '@nestjs/schedule';
-import { ResendConfirmationEmailService } from './services/resendConfirmationEmail.service';
-import { DeleteExpiredMentorsService } from './services/deleteExpiredMentors.service';
+import { GetMentorBySingleQueryService } from './services/getMentorBySingleQuery.service';
 
 @Module({
   imports: [
@@ -37,9 +36,10 @@ import { DeleteExpiredMentorsService } from './services/deleteExpiredMentors.ser
     ListAllRegisteredMentorsService,
     GetMentorByIdService,
     GetMentorByNameAndRoleService,
+    GetMentorBySingleQueryService,
     ActivateMentorService,
     ChangeMentorPasswordService,
-    DeactivateLoggedMentorService,
+    DeleteMentorService,
     FinishMentorRegisterService,
     RedefineMentorPasswordService,
     SendRestorationEmailService,
@@ -48,8 +48,6 @@ import { DeleteExpiredMentorsService } from './services/deleteExpiredMentors.ser
     GenerateCodeUtil,
     FileUploadService,
     JwtService,
-    ResendConfirmationEmailService,
-    DeleteExpiredMentorsService,
   ],
   exports: [MentorRepository],
 })

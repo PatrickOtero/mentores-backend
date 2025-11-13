@@ -36,7 +36,7 @@ import { MentorChangePassDto } from './dtos/mentor-change-pass.dto';
 import { ActivateMentorService } from './services/activateMentor.service';
 import { ChangeMentorPasswordService } from './services/changeMentorPassword.service';
 import { CreateMentorService } from './services/createMentor.service';
-import { DeactivateLoggedMentorService } from './services/deactivateLoggedMentor.service';
+import { DeleteMentorService } from './services/deleteMentor.service';
 import { GetMentorByIdService } from './services/getMentorById.service';
 import { GetMentorByNameAndRoleService } from './services/getMentorByNameAndRole.service';
 import { ListAllMentorsService } from './services/listAllMentors.service';
@@ -49,7 +49,7 @@ import { SwaggerCompleteRegister } from '../../shared/Swagger/decorators/complet
 import { SwaggerChangePassword } from '../../shared/Swagger/decorators/change-password.swagger';
 import { SwaggerUploadProfileImage } from '../../shared/Swagger/decorators/uploadProfileImage.swagger';
 import { ListAllRegisteredMentorsService } from './services/listAllRegisteredMentors.service';
-import { ResendConfirmationEmailService } from './services/resendConfirmationEmail.service';
+import { GetMentorBySingleQueryService } from './services/getMentorBySingleQuery.service';
 
 @ApiTags('mentor')
 @Controller('mentor')
@@ -58,7 +58,7 @@ export class MentorController {
     private activateMentorService: ActivateMentorService,
     private changeMentorPasswordService: ChangeMentorPasswordService,
     private createMentorService: CreateMentorService,
-    private deactivateLoggedMentorService: DeactivateLoggedMentorService,
+    private deleteMentorService: DeleteMentorService,
     private getMentorByIdService: GetMentorByIdService,
     private getMentorByNameAndRoleService: GetMentorByNameAndRoleService,
     private listAllMentorsService: ListAllMentorsService,
@@ -68,8 +68,8 @@ export class MentorController {
     private uploadProfileImageService: UploadProfileImageService,
     private finishMentorRegisterService: FinishMentorRegisterService,
     private getRegisteredMentorsService: ListAllRegisteredMentorsService,
-    private resendConfirmationEmailService: ResendConfirmationEmailService,
-  ) { }
+    private getMentorBySingleQueryService: GetMentorBySingleQueryService,
+  ) {}
 
   @Post()
   @SwaggerCreateMentor()
@@ -106,6 +106,19 @@ export class MentorController {
     const data = await this.getMentorByNameAndRoleService.execute(
       fullName,
       specialty,
+    );
+
+    return res.status(HttpStatus.OK).json(data);
+  }
+
+  @Get('singlequery')
+  @SwaggerGetMentor()
+  async findMentorWithSingleQuery(
+    @Res() res: Response,
+    @Query('query') query: string,
+  ) {
+    const data = await this.getMentorBySingleQueryService.execute(
+      query
     );
 
     return res.status(HttpStatus.OK).json(data);
@@ -177,9 +190,11 @@ export class MentorController {
 
   @ApiExcludeEndpoint()
   @UseGuards(AuthGuard())
-  @Patch()
-  async deactivateLoggedEntity(@LoggedEntity() mentor: MentorEntity) {
-    return this.deactivateLoggedMentorService.execute(mentor);
+  @Patch("delete-mentor")
+  async deleteMentor(
+    @LoggedEntity() mentor: MentorEntity
+  ) {
+    return this.deleteMentorService.execute(mentor);
   }
 
   @SwaggerRestoreAccountEmail()
@@ -207,10 +222,5 @@ export class MentorController {
     } catch (error) {
       console.log(error.message);
     }
-  }
-
-  @Post('resend-confirmation-email')
-  async resendConfirmationEmail(@Body() data: SearchByEmailDto) {
-    return this.resendConfirmationEmailService.execute(data.email);
   }
 }
