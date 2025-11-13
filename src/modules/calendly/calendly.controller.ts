@@ -45,24 +45,23 @@ export class CalendlyController {
       return res.redirect(url);
     }
   
- @Get('callback')
+    @Get('callback')
     async oauthCallback(
       @Query('code') code: string,
       @Query('state') mentorId: string,
       @Res() res: Response,
     ) {
-      const FRONTEND_URL = process.env.REMOTE_FRONTEND_DEV_URL || 'http://localhost:3001';
-
       try {
         await this.oauthCallbackService.execute(code, mentorId);
 
-        return res.redirect(
-          `${FRONTEND_URL}/?connect-calendly=success`
-        );
+        const redirectUrl = `${process.env.REMOTE_FRONTEND_DEV_URL}/?connect-calendly=success`
+
+        return res.redirect(redirectUrl);
+
       } catch (error) {
-        return res.redirect(
-          `${FRONTEND_URL}/?connect-calendly=error`
-        );
+        const redirectUrl = `${process.env.REMOTE_FRONTEND_DEV_URL}/?connect-calendly=error`
+
+        return res.redirect(redirectUrl);
       }
     }
 
