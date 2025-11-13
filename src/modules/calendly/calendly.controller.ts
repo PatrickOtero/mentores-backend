@@ -51,7 +51,7 @@ export class CalendlyController {
       @Query('state') mentorId: string,
       @Res() res: Response,
     ) {
-      const FRONTEND_URL = process.env.REMOTE_FRONTEND_DEV_URL || 'http://localhost:3001';
+      const FRONTEND_URL = process.env.REMOTE_FRONTEND_URL || 'http://localhost:3001';
 
       try {
         await this.oauthCallbackService.execute(code, mentorId);
