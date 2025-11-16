@@ -54,12 +54,12 @@ export class CalendlyController {
       try {
         await this.oauthCallbackService.execute(code, mentorId);
 
-        const redirectUrl = `${process.env.REMOTE_FRONTEND_DEV_URL}/?connect-calendly=success`
+        const redirectUrl = `${process.env.REMOTE_FRONTEND_URL}/?connect-calendly=success`
 
         return res.redirect(redirectUrl);
 
       } catch (error) {
-        const redirectUrl = `${process.env.REMOTE_FRONTEND_DEV_URL}/?connect-calendly=error`
+        const redirectUrl = `${process.env.REMOTE_FRONTEND_URL}/?connect-calendly=error`
 
         return res.redirect(redirectUrl);
       }
