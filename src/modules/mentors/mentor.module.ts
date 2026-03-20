@@ -21,6 +21,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ListAllRegisteredMentorsService } from './services/listAllRegisteredMentors.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { GetMentorBySingleQueryService } from './services/getMentorBySingleQuery.service';
+import { DeleteExpiredMentorsService } from './services/deleteExpiredMentors.service';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { GetMentorBySingleQueryService } from './services/getMentorBySingleQuery
     GenerateCodeUtil,
     FileUploadService,
     JwtService,
+    DeleteExpiredMentorsService
   ],
   exports: [MentorRepository],
 })

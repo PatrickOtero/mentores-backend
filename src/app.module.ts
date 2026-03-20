@@ -24,7 +24,7 @@ import { AccountDeletionFeedbackModule } from './modules/account-deletion-feedba
     MailModule,
     TestimonyModule,
     CalendlyModule,
-    ScheduleModule,
+    ScheduleModule.forRoot(),
     AccountDeletionFeedbackModule,
   ],
   controllers: [AppController],
