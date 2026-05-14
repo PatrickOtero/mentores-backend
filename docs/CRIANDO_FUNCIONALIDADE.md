@@ -175,3 +175,19 @@ Acesse `/api` no navegador para validar visualmente a documentação gerada.
 - Faça PRs de escopos bem definidos, ou seja, PRs com o mínimo possível de alterações, de preferência com apenas uma única funcionalidade nova, ou uma única correção ou melhoria.
 
 ---
+
+### 11. Boas praticas de commits, PRs e agentes
+
+- Faca commits pequenos e com responsabilidade unica.
+- Evite misturar feature, refatoracao, documentacao e ajustes sem relacao no mesmo commit.
+- Antes de abrir PR, revise os arquivos alterados e remova logs, codigo morto e comentarios temporarios.
+- Caso use agentes como apoio, mantenha `AGENTS.md` e arquivos locais de agentes no `.gitignore`.
+- Nao versione prompts, logs, configuracoes pessoais ou arquivos especificos de agentes.
+- Use agentes como apoio, sem depender totalmente deles.
+- Estude continuamente as linguagens, frameworks e bibliotecas usadas no projeto.
+- Entenda, revise e valide cada alteracao antes de commitar.
+- Rejeite qualquer sugestao que quebre arquitetura, contratos, seguranca ou padroes existentes.
+
+Leia tambem `docs/BOAS_PRATICAS_GIT.md`.
+
+---
