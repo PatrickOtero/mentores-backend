@@ -13,12 +13,7 @@ export class UpdateCalendlyInfoService {
 
   async execute(mentorId: string, data: UpdateCalendlyInfoDto) {
     try {
-
-      const mentorData = await this.mentorRepository.findMentorById(mentorId)
-
-      mentorData.registerComplete = true
-
-      await this.mentorRepository.updateMentor(mentorId, mentorData)
+      await this.mentorRepository.registerCompleteToggle(mentorId)
 
       const calendlyInfo = await this.calendlyRepository.updateCalendlyInfo(
         mentorId,
