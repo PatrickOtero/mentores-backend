@@ -23,3 +23,8 @@
 - [ ] A funcionalidade foi testada manualmente
 - [ ] Swagger foi atualizado
 - [ ] As migrações Prisma estão versionadas corretamente
+
+## Boas praticas
+- [ ] Os commits tem responsabilidade unica
+- [ ] Nao foram incluidos arquivos pessoais, temporarios ou de agente
+- [ ] O PR tem escopo pequeno e facil de revisar
