@@ -54,12 +54,12 @@ export class CalendlyController {
       try {
         await this.oauthCallbackService.execute(code, mentorId);
 
-        const redirectUrl = `${process.env.REMOTE_FRONTEND_URL}/?connect-calendly=success`
+        const redirectUrl = `${process.env.LOCAL_FRONTEND_URL}/?connect-calendly=success`
 
         return res.redirect(redirectUrl);
 
       } catch (error) {
-        const redirectUrl = `${process.env.REMOTE_FRONTEND_URL}/?connect-calendly=error`
+        const redirectUrl = `${process.env.LOCAL_FRONTEND_URL}/?connect-calendly=error`
 
         return res.redirect(redirectUrl);
       }
@@ -82,6 +82,7 @@ export class CalendlyController {
     }
   
     @Put(':id')
+    @UseGuards(AuthGuard())
     async updateCalendlyInfo(
       @Body() data: UpdateCalendlyInfoDto,
       @LoggedEntity() mentor: MentorEntity
