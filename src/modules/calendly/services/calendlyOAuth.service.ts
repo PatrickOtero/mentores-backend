@@ -4,8 +4,8 @@ import { Injectable } from '@nestjs/common';
 export class InitiateOAuthService {
   async initiateOAuth(mentorId: string) {
     const params = new URLSearchParams({
-      client_id: process.env.SOUJUNIOR_LOCAL_CLIENT_ID,
-      redirect_uri: process.env.SOUJUNIOR_LOCAL_REDIRECT_URI,
+      client_id: process.env.SOUJUNIOR_DEV_CLIENT_ID,
+      redirect_uri: process.env.SOUJUNIOR_DEV_REDIRECT_URI,
       response_type: 'code',
       scope: 'user:read:email scheduling:read',
       state: mentorId,
