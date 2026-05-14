@@ -23,15 +23,9 @@ export class OAuthCallbackService {
         new URLSearchParams({
           grant_type: 'authorization_code',
           code: code,
-<<<<<<< HEAD
           redirect_uri: process.env.CALENDLY_REDIRECT_URI,
           client_id: process.env.CALENDLY_CLIENT_ID,
           client_secret: process.env.CALENDLY_CLIENT_SECRET,
-=======
-          redirect_uri: process.env.SOUJUNIOR_DEV_REDIRECT_URI,
-          client_id: process.env.SOUJUNIOR_DEV_CLIENT_ID,
-          client_secret: process.env.SOUJUNIOR_DEV_CLIENT_SECRET,
->>>>>>> 28480ca19788fb0218e7e5c6c6ff6e44aea448f7
         }),
       );
 
