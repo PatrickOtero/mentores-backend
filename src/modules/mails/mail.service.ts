@@ -11,7 +11,7 @@ export class MailService {
 
   async mentorSendEmailConfirmation(mentor: MentorEntity): Promise<void> {
     const { email, fullName, code } = mentor;
-    const url = `${process.env.URL_CONFIRM_EMAIL_LOCAL}?code=${code}&email=${email}`;
+    const url = `${process.env.REMOTE_FRONTEND_URL}/confirmacao?code=${code}&email=${email}`;
 
     await this.mailerService
       .sendMail({
@@ -30,9 +30,9 @@ export class MailService {
 
   async mentorSendCreationConfirmation(mentor: MentorEntity) {
     const { email, fullName, code } = mentor;
-    const { URL_CONFIRM_EMAIL_LOCAL } = process.env;
+    const { REMOTE_FRONTEND_URL } = process.env;
 
-    const url = `${URL_CONFIRM_EMAIL_LOCAL}?code=${code}&email=${email}`;
+    const url = `${REMOTE_FRONTEND_URL}/confirmacao?code=${code}&email=${email}`;
 
     try {
       await this.mailerService
@@ -56,9 +56,9 @@ export class MailService {
 
   async mentorSendRestorationEmail(mentorData: MentorEntity) {
     const { email, code } = mentorData;
-    const { URL_RESTORATION_EMAIL } = process.env;
+    const { REMOTE_FRONTEND_URL } = process.env;
 
-    const url = `${URL_RESTORATION_EMAIL}?code=${code}&email=${email}`;
+    const url = `${REMOTE_FRONTEND_URL}/setNewPassword?code=${code}&email=${email}`;
 
     try {
       await this.mailerService
