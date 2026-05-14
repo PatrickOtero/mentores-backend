@@ -13,14 +13,7 @@ async function bootstrap() {
     .filter(Boolean);
 
   app.enableCors({
-<<<<<<< HEAD
     origin: corsOrigins?.length ? corsOrigins : process.env.FRONTEND_URL,
-=======
-    origin: [
-    process.env.REMOTE_FRONTEND_DEV_URL,
-    process.env.LOCAL_FRONTEND_URL,
-  ],
->>>>>>> 28480ca19788fb0218e7e5c6c6ff6e44aea448f7
     credentials: true,
   });
 
