@@ -81,7 +81,7 @@ export class CalendlyController {
       return await this.createCalendlyInfoService.execute(data, mentor.id);
     }
   
-    @Put(':id')
+    @Put('mentorInfo')
     @UseGuards(AuthGuard())
     async updateCalendlyInfo(
       @Body() data: UpdateCalendlyInfoDto,
