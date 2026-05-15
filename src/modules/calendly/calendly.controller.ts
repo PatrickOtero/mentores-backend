@@ -82,6 +82,7 @@ export class CalendlyController {
     }
   
     @Put(':id')
+    @UseGuards(AuthGuard())
     async updateCalendlyInfo(
       @Body() data: UpdateCalendlyInfoDto,
       @LoggedEntity() mentor: MentorEntity

@@ -27,9 +27,13 @@ export class CalendlyRepository {
     mentorId: string,
     updateCalendlyInfoDto: UpdateCalendlyInfoDto,
   ) {
-    return this.prisma.calendlyInfo.update({
+    return this.prisma.calendlyInfo.upsert({
       where: { mentorId },
-      data: updateCalendlyInfoDto,
+      update: updateCalendlyInfoDto,
+      create: {
+        mentorId,
+        ...updateCalendlyInfoDto,
+      },
     });
   }
 

@@ -12,6 +12,9 @@ export class InitiateOAuthService {
     });
 
     const url = `https://calendly.com/oauth/authorize?${params.toString()}`;
-    return { url };
+
+    console.log(`Redirecting to Calendly OAuth URL: ${url}`);
+
+    return { message: 'OAuth initiated', url };
   }
 }
