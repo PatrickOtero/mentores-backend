@@ -11,7 +11,7 @@ export class MailService {
 
   async mentorSendEmailConfirmation(mentor: MentorEntity): Promise<void> {
     const { email, fullName, code } = mentor;
-    const url = `${process.env.URL_CONFIRM_EMAIL}?code=${code}&email=${email}`;
+    const url = `${process.env.EMAIL_CONFIRMATION_URL}?code=${code}&email=${email}`;
 
     await this.mailerService
       .sendMail({
@@ -30,9 +30,9 @@ export class MailService {
 
   async mentorSendCreationConfirmation(mentor: MentorEntity) {
     const { email, fullName, code } = mentor;
-    const { URL_CONFIRM_EMAIL } = process.env;
+    const { EMAIL_CONFIRMATION_URL } = process.env;
 
-    const url = `${URL_CONFIRM_EMAIL}?code=${code}&email=${email}`;
+    const url = `${EMAIL_CONFIRMATION_URL}?code=${code}&email=${email}`;
 
     try {
       await this.mailerService
@@ -56,9 +56,9 @@ export class MailService {
 
   async mentorSendRestorationEmail(mentorData: MentorEntity) {
     const { email, code } = mentorData;
-    const { URL_RESTORATION_EMAIL } = process.env;
+    const { PASSWORD_RESTORATION_URL } = process.env;
 
-    const url = `${URL_RESTORATION_EMAIL}?code=${code}&email=${email}`;
+    const url = `${PASSWORD_RESTORATION_URL}?code=${code}&email=${email}`;
 
     try {
       await this.mailerService
@@ -148,7 +148,7 @@ export class MailService {
 
   async userSendEmailConfirmation(user: UserEntity): Promise<void> {
     const { email, fullName, code } = user;
-    const url = `${process.env.URL_CONFIRM_EMAIL}?code=${code}&email=${email}`;
+    const url = `${process.env.EMAIL_CONFIRMATION_URL}?code=${code}&email=${email}`;
 
     await this.mailerService
       .sendMail({
@@ -167,9 +167,9 @@ export class MailService {
 
   async userSendCreationConfirmation(user: UserEntity) {
     const { email, fullName, code } = user;
-    const { URL_CONFIRM_EMAIL } = process.env;
+    const { EMAIL_CONFIRMATION_URL } = process.env;
 
-    const url = `${URL_CONFIRM_EMAIL}?code=${code}&email=${email}`;
+    const url = `${EMAIL_CONFIRMATION_URL}?code=${code}&email=${email}`;
 
     try {
       await this.mailerService
@@ -193,9 +193,9 @@ export class MailService {
 
   async userSendRestorationEmail(userData: UserEntity) {
     const { email, code } = userData;
-    const { URL_RESTORATION_EMAIL } = process.env;
+    const { PASSWORD_RESTORATION_URL } = process.env;
 
-    const url = `${URL_RESTORATION_EMAIL}?code=${code}&email=${email}`;
+    const url = `${PASSWORD_RESTORATION_URL}?code=${code}&email=${email}`;
 
     try {
       await this.mailerService
