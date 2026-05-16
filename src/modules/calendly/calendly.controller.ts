@@ -3,7 +3,6 @@ import { OAuthCallbackService } from './services/calendly-callback.service';
 import { InitiateOAuthService } from './services/calendlyOAuth.service';
 import { FetchSchedulesService } from './services/fetch-schedules.service';
 import { Response } from 'express';
-import { TokenMiddleware } from '../../middlewares/token.middleware';
 import { SearchByEmailDto } from './dto/search-by-email.dto';
 import { CreateCalendlyInfoDto, UpdateCalendlyInfoDto } from './dto/calendly-info-dto';
 import { CreateCalendlyInfoService } from './services/create-calendly-info.service';
@@ -13,6 +12,12 @@ import { MentorEntity } from '../mentors/entities/mentor.entity';
 import { GetCalendlyMentorInfoService } from './services/get-calendly-mentor-info.service';
 import { AuthGuard } from '@nestjs/passport';
 import { GetAllCalendlyMentorInfosService } from './services/get-all-calendly-mentor-infos.service';
+import { CalendlySchedulingService } from './services/calendly-scheduling.service';
+import {
+  CancelCalendlyScheduleDto,
+  CreateCalendlyInviteeDto,
+  GetCalendlyAvailableTimesDto,
+} from './dto/calendly-scheduling.dto';
 
 
 @Controller('calendly')
@@ -25,7 +30,8 @@ export class CalendlyController {
         private createCalendlyInfoService: CreateCalendlyInfoService,
         private updateCalendlyInfoService: UpdateCalendlyInfoService,
         private getCalendlyMentorInfoService: GetCalendlyMentorInfoService,
-        private getAllCalendlyMentorInfosService: GetAllCalendlyMentorInfosService
+        private getAllCalendlyMentorInfosService: GetAllCalendlyMentorInfosService,
+        private calendlySchedulingService: CalendlySchedulingService
       ) {}
       
     @Get("")
@@ -67,9 +73,44 @@ export class CalendlyController {
 
     @Get('schedules')
     @UseGuards(AuthGuard())
-    @UseGuards(TokenMiddleware)
     async fetchMentorSchedules(@LoggedEntity() mentor: MentorEntity) {
       return this.fetchSchedulesService.getMentorSchedules(mentor.id);
+    }
+
+    @Get('mentor/:mentorId/available-times')
+    async getMentorAvailableTimes(
+      @Param('mentorId') mentorId: string,
+      @Query() query: GetCalendlyAvailableTimesDto,
+    ) {
+      return this.calendlySchedulingService.getAvailableTimes(mentorId, query);
+    }
+
+    @Post('mentor/:mentorId/invitees')
+    @UseGuards(AuthGuard())
+    async createMentorInvitee(
+      @Param('mentorId') mentorId: string,
+      @Body() data: CreateCalendlyInviteeDto,
+      @LoggedEntity() invitee: MentorEntity,
+    ) {
+      return this.calendlySchedulingService.createInvitee(
+        mentorId,
+        invitee,
+        data,
+      );
+    }
+
+    @Post('schedules/:eventUuid/cancellation')
+    @UseGuards(AuthGuard())
+    async cancelMentorSchedule(
+      @Param('eventUuid') eventUuid: string,
+      @Body() data: CancelCalendlyScheduleDto,
+      @LoggedEntity() mentor: MentorEntity,
+    ) {
+      return this.calendlySchedulingService.cancelSchedule(
+        mentor.id,
+        eventUuid,
+        data,
+      );
     }
 
     @Post("")

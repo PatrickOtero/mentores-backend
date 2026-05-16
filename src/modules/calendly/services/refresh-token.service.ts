@@ -30,13 +30,17 @@ export class RefreshTokenService {
       );
 
       const accessToken = tokenResponse.access_token;
+      const refreshToken = tokenResponse.refresh_token;
       const expiresIn = tokenResponse.expires_in;
       const expirationTime = new Date(Date.now() + expiresIn * 1000);
 
       await this.calendlyRepository.updateCalendlyInfo(mentorId, {
         calendlyAccessToken: accessToken,
+        calendlyRefreshToken: refreshToken || calendlyInfo.calendlyRefreshToken,
         accessTokenExpiration: expirationTime,
       });
+
+      return accessToken;
     } catch (error) {
       console.error(
         'Error refreshing access token:',

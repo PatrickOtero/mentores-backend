@@ -14,6 +14,7 @@ import { GetCalendlyMentorInfoService } from "./services/get-calendly-mentor-inf
 import { PassportModule } from "@nestjs/passport";
 import HttpAdapter from "../../lib/adapter/httpAdapter";
 import { GetAllCalendlyMentorInfosService } from "./services/get-all-calendly-mentor-infos.service";
+import { CalendlySchedulingService } from "./services/calendly-scheduling.service";
 
 @Module({
   imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
@@ -27,6 +28,7 @@ import { GetAllCalendlyMentorInfosService } from "./services/get-all-calendly-me
     UpdateCalendlyInfoService,
     GetCalendlyMentorInfoService,
     GetAllCalendlyMentorInfosService,
+    CalendlySchedulingService,
     CalendlyRepository,
     MentorRepository,
     PrismaService,
