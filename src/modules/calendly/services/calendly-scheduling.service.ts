@@ -87,7 +87,7 @@ export class CalendlySchedulingService {
 
     return {
       schedulingUrl: this.buildPrefilledSchedulingUrl(
-        data.schedulingUrl || eventType.scheduling_url,
+        this.resolveSchedulingUrl(eventType.scheduling_url, data.schedulingUrl),
         invitee,
         data,
       ),
@@ -267,6 +267,39 @@ export class CalendlySchedulingService {
     }
 
     return url.toString();
+  }
+
+  private resolveSchedulingUrl(
+    calendlySchedulingUrl?: string,
+    requestedSchedulingUrl?: string,
+  ) {
+    if (!calendlySchedulingUrl) {
+      throw new BadRequestException(
+        'Link do Calendly não configurado para este mentor.',
+      );
+    }
+
+    if (!requestedSchedulingUrl) {
+      return calendlySchedulingUrl;
+    }
+
+    try {
+      const calendlyUrl = new URL(calendlySchedulingUrl);
+      const requestedUrl = new URL(requestedSchedulingUrl);
+      const calendlyPath = calendlyUrl.pathname.replace(/\/$/, '');
+      const requestedPath = requestedUrl.pathname.replace(/\/$/, '');
+
+      if (
+        requestedUrl.origin === calendlyUrl.origin &&
+        requestedPath === calendlyPath
+      ) {
+        return requestedUrl.toString();
+      }
+    } catch {
+      return calendlySchedulingUrl;
+    }
+
+    return calendlySchedulingUrl;
   }
 
   private async fetchAndSaveMentorUuid(
