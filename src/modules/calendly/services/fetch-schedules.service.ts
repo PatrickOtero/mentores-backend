@@ -1,11 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CalendlyRepository } from '../repository/calendly.repository';
 import { IHttpAdapter } from '../../../lib/adapter/httpAdapterInterface';
+import { RefreshTokenService } from './refresh-token.service';
 
 @Injectable()
 export class FetchSchedulesService {
   constructor(
     private readonly calendlyRepository: CalendlyRepository,
+    private readonly refreshTokenService: RefreshTokenService,
     @Inject('IHttpAdapter') private readonly httpAdapter: IHttpAdapter
   ) {}
 
@@ -16,8 +18,17 @@ export class FetchSchedulesService {
       throw new Error('Mentor not connected to Calendly');
     }
 
+    let accessToken = calendlyInfo.calendlyAccessToken;
+
+    if (
+      calendlyInfo.accessTokenExpiration &&
+      new Date() >= new Date(calendlyInfo.accessTokenExpiration)
+    ) {
+      accessToken = await this.refreshTokenService.execute(mentorId);
+    }
+
     if (!calendlyInfo.calendlyUserUuid) {
-      calendlyInfo.calendlyUserUuid = await this.fetchAndSaveMentorUuid(mentorId, calendlyInfo.calendlyAccessToken);
+      calendlyInfo.calendlyUserUuid = await this.fetchAndSaveMentorUuid(mentorId, accessToken);
     }
 
     const userUrlUuid = `https://api.calendly.com/users/${calendlyInfo.calendlyUserUuid}`;
@@ -26,12 +37,13 @@ export class FetchSchedulesService {
         `/scheduled_events?user=${userUrlUuid}&status=active&sort=start_time:desc`,
         {
           headers: {
-            Authorization: `Bearer ${calendlyInfo.calendlyAccessToken}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
 
-      const filteredEvents = await this.extractRelevantEventData(eventsResponse.collection, calendlyInfo.calendlyAccessToken);
+      const upcomingEvents = this.filterUpcomingEvents(eventsResponse.collection || []);
+      const filteredEvents = await this.extractRelevantEventData(upcomingEvents, accessToken);
       return filteredEvents;
     } catch (error: any) {
       console.error('Error fetching scheduled events:', error.response?.data);
@@ -78,6 +90,8 @@ export class FetchSchedulesService {
       }));
   
       eventDetails.push({
+        eventUuid: eventId,
+        eventUri: event.uri,
         eventName: event.name,
         description: event.description || 'No description provided',
         startTime: event.start_time,
@@ -96,5 +110,14 @@ export class FetchSchedulesService {
     const durationMs = new Date(endTime).getTime() - new Date(startTime).getTime();
     const minutes = Math.floor(durationMs / (1000 * 60));
     return `${minutes} minutes`;
+  }
+
+  private filterUpcomingEvents(events: any[]): any[] {
+    const now = Date.now();
+
+    return events.filter(event => {
+      const eventEndTime = new Date(event.end_time || event.start_time).getTime();
+      return !Number.isNaN(eventEndTime) && eventEndTime > now;
+    });
   }
 }
