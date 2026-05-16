@@ -38,6 +38,9 @@ export class RedefineMentorPasswordService {
 
     mentorExists.code = null;
     mentorExists.accessAttempt = 0;
+    mentorExists.deleted = false;
+    mentorExists.deactivatedDays = 0;
+    mentorExists.deactivatedAt = null;
 
     await this.mentorRepository.updateMentor(mentorExists.id, mentorExists);
 

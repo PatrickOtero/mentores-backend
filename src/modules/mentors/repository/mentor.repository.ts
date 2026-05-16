@@ -75,8 +75,8 @@ export class MentorRepository extends PrismaClient {
 
   async findMentorById(id: string) {
     return this.mentors
-      .findUnique({
-        where: { id },
+      .findFirst({
+        where: { id, deleted: false },
         select: {
           id: true,
           fullName: true,

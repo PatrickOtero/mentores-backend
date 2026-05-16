@@ -27,7 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       .findUserByEmail(payload.email)
       .catch(handleError);
 
-    if (!mentor && !user) {
+    if ((!mentor && !user) || mentor?.deleted || user?.deleted) {
       throw new UnauthorizedException('User not found or not authorized!');
     }
 

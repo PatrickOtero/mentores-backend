@@ -38,6 +38,8 @@ export class RedefineUserPasswordService {
 
     userExists.code = null;
     userExists.accessAttempt = 0;
+    userExists.deleted = false;
+    userExists.deactivatedDays = 0;
 
     await this.userRepository.updateUser(userExists.id, userExists);
 

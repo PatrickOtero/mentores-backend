@@ -5,6 +5,7 @@ export class InfoEntity {
   dateOfBirth: string | Date;
   deleted?: boolean;
   deactivatedDays?: number;
+  deactivatedAt?: Date | null | string;
   aboutMe?: string;
   gender?: string;
   email: string;

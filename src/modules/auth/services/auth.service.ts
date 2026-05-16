@@ -15,6 +15,8 @@ import { CalendlyRepository } from '../../../modules/calendly/repository/calendl
 
 @Injectable()
 export class AuthService {
+  private readonly DELETION_GRACE_PERIOD_DAYS = 30;
+
   constructor(
     private calendlyRepository: CalendlyRepository,
     private mentorRepository: MentorRepository,
@@ -41,11 +43,18 @@ export class AuthService {
     }
 
     info.accessAttempt = 0;
-    info.deleted = false
+    if (info.deleted) {
+      info.deleted = false;
+      info.deactivatedDays = 0;
+      info.deactivatedAt = null;
+    }
+
+    const infoToUpdate = { ...info };
+
     if (type === 'mentor') {
-      await this.mentorRepository.updateMentor(info.id, info);
+      await this.mentorRepository.updateMentor(info.id, infoToUpdate);
     } else {
-      await this.userRepository.updateUser(info.id, info);
+      await this.userRepository.updateUser(info.id, infoToUpdate);
     }
 
     const calendlyMentorData =
@@ -73,7 +82,7 @@ export class AuthService {
   }
 
   async infoConfirm(info: InfoEntity, type: string) {
-    if (!info || (info.deleted == true && info.deactivatedDays > 30)) {
+    if (!info || this.isDeletionExpired(info)) {
       const message = 'invalid e-mail or password';
       throw new HttpException({ message }, HttpStatus.NOT_FOUND);
     }
@@ -93,6 +102,23 @@ export class AuthService {
     }
 
     return;
+  }
+
+  private isDeletionExpired(info: InfoEntity): boolean {
+    if (!info.deleted) {
+      return false;
+    }
+
+    if (!info.deactivatedAt) {
+      return info.deactivatedDays > this.DELETION_GRACE_PERIOD_DAYS;
+    }
+
+    const expirationDate = new Date(info.deactivatedAt);
+    expirationDate.setDate(
+      expirationDate.getDate() + this.DELETION_GRACE_PERIOD_DAYS,
+    );
+
+    return new Date() > expirationDate;
   }
 
   async invalidPassword(info: InfoEntity, type) {
