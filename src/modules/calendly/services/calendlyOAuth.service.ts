@@ -1,8 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 @Injectable()
 export class InitiateOAuthService {
   async initiateOAuth(mentorId: string) {
+    if (!process.env.CALENDLY_CLIENT_ID || !process.env.CALENDLY_REDIRECT_URI) {
+      throw new InternalServerErrorException(
+        'Configuração do Calendly não encontrada.',
+      );
+    }
+
     const params = new URLSearchParams({
       client_id: process.env.CALENDLY_CLIENT_ID,
       redirect_uri: process.env.CALENDLY_REDIRECT_URI,
@@ -12,8 +18,6 @@ export class InitiateOAuthService {
     });
 
     const url = `https://calendly.com/oauth/authorize?${params.toString()}`;
-
-    console.log(`Redirecting to Calendly OAuth URL: ${url}`);
 
     return { message: 'OAuth initiated', url };
   }
