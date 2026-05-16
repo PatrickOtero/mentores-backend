@@ -9,7 +9,19 @@ export class GetCalendlyMentorInfoService {
   async execute(mentorId: string) {
     try {
       const calendlyInfo = await this.calendlyRepository.getCalendlyInfoByMentorId(mentorId)
-      return calendlyInfo;
+      if (!calendlyInfo) {
+        return null;
+      }
+
+      return {
+        id: calendlyInfo.id,
+        mentorId: calendlyInfo.mentorId,
+        calendlyName: calendlyInfo.calendlyName,
+        agendaName: calendlyInfo.agendaName,
+        isConnected: Boolean(
+          calendlyInfo.calendlyAccessToken && calendlyInfo.calendlyRefreshToken,
+        ),
+      };
     } catch (error) {
       console.error('Error returning Calendly info:', error.message);
       throw new InternalServerErrorException(

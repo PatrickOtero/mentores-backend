@@ -7,7 +7,16 @@ export class CalendlyRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async getAllCalendlyMentorInfos() {
-    return this.prisma.calendlyInfo.findMany()
+    return this.prisma.calendlyInfo.findMany({
+      select: {
+        id: true,
+        mentorId: true,
+        calendlyName: true,
+        agendaName: true,
+        calendlyAccessToken: true,
+        calendlyRefreshToken: true,
+      },
+    })
   }
 
   async createCalendlyInfo(
