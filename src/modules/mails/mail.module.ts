@@ -26,7 +26,7 @@ import { MailService } from './mail.service';
           },
         },
         defaults: {
-          from: `no-reply <no-reply@mentores-backend.com>`,
+          from: `portal de mentorias <no-reply@mentores-backend.com>`,
         },
         template: {
           dir: join(__dirname, 'templates'),
