@@ -24,8 +24,8 @@ export class RefreshTokenService {
         new URLSearchParams({
           grant_type: 'refresh_token',
           refresh_token: calendlyInfo.calendlyRefreshToken,
-          client_id: process.env.SOUJUNIOR_CLIENT_ID,
-          client_secret: process.env.SOUJUNIOR_CLIENT_SECRET,
+          client_id: process.env.CALENDLY_CLIENT_ID,
+          client_secret: process.env.CALENDLY_CLIENT_SECRET,
         }),
       );
 
