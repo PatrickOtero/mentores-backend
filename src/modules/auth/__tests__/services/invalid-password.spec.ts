@@ -1,14 +1,16 @@
-import { AuthService } from '../../services/auth.service';
-import { UserRepository } from 'src/modules/user/user.repository';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { MailService } from 'src/modules/mails/mail.service';
+import { MentorRepository } from 'src/modules/mentors/repository/mentor.repository';
+import { UserRepository } from 'src/modules/user/user.repository';
+import { CalendlyRepository } from 'src/modules/calendly/repository/calendly.repository';
+import IHashAdapter from 'src/lib/adapter/hash/hashAdapterInterface';
+import { AuthService } from '../../services/auth.service';
 import { InfoLoginDto } from '../../dtos/info-login.dto';
 import { LoginTypeEnum } from '../../enums/login-type.enum';
 import { InfoEntity } from '../../entity/info.entity';
-import { HttpException, HttpStatus } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import { CalendlyRepository } from 'src/modules/calendly/repository/calendly.repository';
-import { MentorRepository } from 'src/modules/mentors/repository/mentor.repository';
+import { AuthErrorCodeEnum } from '../../enums/auth-error-code.enum';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -17,26 +19,35 @@ describe('AuthService', () => {
   let jwtService: JwtService;
   let mailService: MailService;
   let calendlyRepository: CalendlyRepository;
-
+  let hashAdapter: IHashAdapter;
 
   beforeEach(() => {
     mentorRepository = {
-      findMentorByEmail: jest.fn(),
-      updateMentor: jest.fn(),
+      findMentorByEmail: vi.fn(),
+      updateMentor: vi.fn(),
     } as any;
 
     userRepository = {
-      findUserByEmail: jest.fn(),
-      updateUser: jest.fn(),
+      findUserByEmail: vi.fn(),
+      updateUser: vi.fn(),
     } as any;
 
     jwtService = {
-      sign: jest.fn(),
+      sign: vi.fn(),
     } as any;
 
     mailService = {
-      mentorSendCreationConfirmation: jest.fn(),
-      userSendCreationConfirmation: jest.fn(),
+      mentorSendCreationConfirmation: vi.fn(),
+      userSendCreationConfirmation: vi.fn(),
+    } as any;
+
+    calendlyRepository = {
+      getCalendlyInfoByMentorId: vi.fn(),
+    } as any;
+
+    hashAdapter = {
+      compareHash: vi.fn(),
+      createHash: vi.fn(),
     } as any;
 
     authService = new AuthService(
@@ -45,23 +56,21 @@ describe('AuthService', () => {
       userRepository,
       jwtService,
       mailService,
+      hashAdapter,
     );
   });
 
-  it('Should throw error if password is invalid and increment accessAttempt', async () => {
+  it('should throw invalid credentials with a stable error code', async () => {
     const loginData: InfoLoginDto = {
       email: 'mentor@example.com',
-      password: 'wrongpassword',
-      type: LoginTypeEnum.USER,
+      password: 'wrong-password',
+      type: LoginTypeEnum.MENTOR,
     };
-
-    jest.spyOn(bcrypt, 'compare').mockResolvedValue(false as never);
-    jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashedpassword' as never);
 
     const mockInfo: InfoEntity = {
       id: '1',
       email: loginData.email,
-      password: await bcrypt.hash('correctpassword', 10),
+      password: 'hashed-password',
       emailConfirmed: true,
       deleted: false,
       dateOfBirth: '1990-01-01',
@@ -69,14 +78,23 @@ describe('AuthService', () => {
       accessAttempt: 0,
     };
 
-    mentorRepository.findMentorByEmail = jest.fn().mockResolvedValue(mockInfo);
-
-    await expect(authService.execute(loginData)).rejects.toThrow(
-      new HttpException(
-        { message: 'Invalid e-mail or password' },
-        HttpStatus.NOT_FOUND,
-      ),
+    vi.mocked(mentorRepository.findMentorByEmail).mockResolvedValue(
+      mockInfo as any,
     );
+    vi.mocked(hashAdapter.compareHash).mockResolvedValue(false);
+
+    try {
+      await authService.execute(loginData);
+      throw new Error('Expected an invalid credentials error');
+    } catch (error) {
+      expect(error).toBeInstanceOf(HttpException);
+      expect((error as HttpException).getStatus()).toBe(HttpStatus.NOT_FOUND);
+      expect((error as HttpException).getResponse()).toEqual({
+        code: AuthErrorCodeEnum.INVALID_CREDENTIALS,
+        message: 'invalid e-mail or password',
+      });
+    }
+
     expect(mentorRepository.updateMentor).toHaveBeenCalledWith(mockInfo.id, {
       ...mockInfo,
       accessAttempt: 1,

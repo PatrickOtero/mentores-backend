@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -7,6 +8,9 @@ import {
 } from '@nestjs/common';
 import { IHttpAdapter } from '../../../lib/adapter/httpAdapterInterface';
 import { CalendlyRepository } from '../repository/calendly.repository';
+import { UserEntity } from '../../user/entities/user.entity';
+import { UserRepository } from '../../user/user.repository';
+import { MentorshipFeedbackRepository } from '../../mentorship-feedback/repository/mentorship-feedback.repository';
 import {
   CancelCalendlyScheduleDto,
   CreateCalendlyInviteeDto,
@@ -17,6 +21,7 @@ import { RefreshTokenService } from './refresh-token.service';
 interface CalendlyEventType {
   uri: string;
   name: string;
+  duration?: number;
   scheduling_url?: string;
   slug?: string;
   active?: boolean;
@@ -31,12 +36,19 @@ interface CalendlyAccessData {
 export class CalendlySchedulingService {
   constructor(
     private readonly calendlyRepository: CalendlyRepository,
+    private readonly userRepository: UserRepository,
+    private readonly mentorshipFeedbackRepository: MentorshipFeedbackRepository,
     private readonly refreshTokenService: RefreshTokenService,
     @Inject('IHttpAdapter') private readonly httpAdapter: IHttpAdapter,
   ) {}
 
-  async getAvailableTimes(mentorId: string, query: GetCalendlyAvailableTimesDto) {
-    const { accessToken, eventType } = await this.getCalendlyAccessData(mentorId);
+  async getAvailableTimes(
+    mentorId: string,
+    query: GetCalendlyAvailableTimesDto,
+  ) {
+    const { accessToken, eventType } = await this.getCalendlyAccessData(
+      mentorId,
+    );
     const ranges = this.buildCalendlyRanges(query.startTime, query.endTime);
     const availableTimes = [];
 
@@ -80,16 +92,52 @@ export class CalendlySchedulingService {
 
   async createInvitee(
     mentorId: string,
-    invitee: { fullName: string; email: string },
+    invitee: UserEntity,
     data: CreateCalendlyInviteeDto,
   ) {
+    const menteeProfile = await this.userRepository.findUserByEmail(
+      invitee.email,
+    );
+
+    if (
+      !menteeProfile ||
+      menteeProfile.deleted ||
+      menteeProfile.id !== invitee.id
+    ) {
+      throw new ForbiddenException('Active profile is not a mentee profile');
+    }
+
     const { eventType } = await this.getCalendlyAccessData(mentorId);
+    const schedulingUrl = this.resolveSchedulingUrl(
+      eventType.scheduling_url,
+      data.schedulingUrl,
+    );
+    const preserveSelectedSlot =
+      Boolean(data.schedulingUrl) && schedulingUrl === data.schedulingUrl;
+    const endTime = this.calculateEndTime(data.startTime, eventType.duration);
+    const duration = this.formatDuration(eventType.duration);
+
+    await this.mentorshipFeedbackRepository.upsertHistorySession({
+      mentor_id: mentorId,
+      mentee_id: menteeProfile.id,
+      status: 'PENDING',
+      eventName: eventType.name || 'Mentoria',
+      description: data.description?.trim() || '',
+      inviteeName: menteeProfile.fullName,
+      inviteeEmail: menteeProfile.email,
+      startTime: data.startTime,
+      endTime,
+      timezone: data.timezone,
+      schedulingUrl,
+      duration,
+    });
 
     return {
       schedulingUrl: this.buildPrefilledSchedulingUrl(
-        this.resolveSchedulingUrl(eventType.scheduling_url, data.schedulingUrl),
-        invitee,
+        schedulingUrl,
+        menteeProfile,
         data,
+        preserveSelectedSlot,
       ),
       selectedStartTime: data.startTime,
       scheduled: false,
@@ -123,7 +171,8 @@ export class CalendlySchedulingService {
     } catch (error) {
       if (this.isPastEventCancellationError(error)) {
         return {
-          message: 'Agendamento já ocorreu e não pode mais ser cancelado no Calendly.',
+          message:
+            'Agendamento já ocorreu e não pode mais ser cancelado no Calendly.',
           status: 'past_event',
         };
       }
@@ -195,7 +244,7 @@ export class CalendlySchedulingService {
         calendlyInfo.agendaName,
       );
 
-      const eventType = eventTypes.find(type => {
+      const eventType = eventTypes.find((type) => {
         const typeUrl = type.scheduling_url?.replace(/\/$/, '');
         return (
           typeUrl === schedulingUrl ||
@@ -242,6 +291,7 @@ export class CalendlySchedulingService {
     schedulingUrl: string,
     invitee: { fullName: string; email: string },
     data: CreateCalendlyInviteeDto,
+    preserveSelectedSlot = false,
   ) {
     if (!schedulingUrl) {
       throw new BadRequestException(
@@ -256,7 +306,7 @@ export class CalendlySchedulingService {
     url.searchParams.set('email', invitee.email);
     url.searchParams.set('timezone', data.timezone);
 
-    if (!Number.isNaN(selectedDate.getTime())) {
+    if (!preserveSelectedSlot && !Number.isNaN(selectedDate.getTime())) {
       const date = selectedDate.toISOString().slice(0, 10);
       url.searchParams.set('date', date);
       url.searchParams.set('month', date.slice(0, 7));
@@ -286,13 +336,8 @@ export class CalendlySchedulingService {
     try {
       const calendlyUrl = new URL(calendlySchedulingUrl);
       const requestedUrl = new URL(requestedSchedulingUrl);
-      const calendlyPath = calendlyUrl.pathname.replace(/\/$/, '');
-      const requestedPath = requestedUrl.pathname.replace(/\/$/, '');
 
-      if (
-        requestedUrl.origin === calendlyUrl.origin &&
-        requestedPath === calendlyPath
-      ) {
+      if (requestedUrl.origin === calendlyUrl.origin) {
         return requestedUrl.toString();
       }
     } catch {
@@ -356,13 +401,42 @@ export class CalendlySchedulingService {
       ranges.push({
         startTime: currentStart.toISOString(),
         endTime:
-          currentEnd < endDate ? currentEnd.toISOString() : endDate.toISOString(),
+          currentEnd < endDate
+            ? currentEnd.toISOString()
+            : endDate.toISOString(),
       });
 
       currentStart = currentEnd;
     }
 
     return ranges;
+  }
+
+  private calculateEndTime(startTime: string, durationInMinutes?: number) {
+    const selectedStartTime = new Date(startTime);
+
+    if (
+      Number.isNaN(selectedStartTime.getTime()) ||
+      !durationInMinutes ||
+      durationInMinutes <= 0
+    ) {
+      return undefined;
+    }
+
+    const selectedEndTime = new Date(selectedStartTime);
+    selectedEndTime.setMinutes(
+      selectedEndTime.getMinutes() + durationInMinutes,
+    );
+
+    return selectedEndTime;
+  }
+
+  private formatDuration(durationInMinutes?: number) {
+    if (!durationInMinutes || durationInMinutes <= 0) {
+      return '';
+    }
+
+    return `${durationInMinutes} minutes`;
   }
 
   private isPastEventCancellationError(error: any) {

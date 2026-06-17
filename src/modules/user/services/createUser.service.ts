@@ -4,6 +4,7 @@ import { GenerateCodeUtil } from '../../../shared/utils/generate-code.util';
 import { MailService } from '../../../modules/mails/mail.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
+import { LoginTypeEnum } from '../../auth/enums/login-type.enum';
 
 @Injectable()
 export class CreateUserService {
@@ -26,6 +27,7 @@ export class CreateUserService {
 
     data.password = await bcrypt.hash(data.password, 10);
     data.code = this.generateCodeUtil.create();
+    data.defaultProfile = LoginTypeEnum.USER;
 
     delete data.passwordConfirmation;
     delete data.emailConfirm;

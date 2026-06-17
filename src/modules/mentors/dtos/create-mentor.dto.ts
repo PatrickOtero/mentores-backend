@@ -91,10 +91,14 @@ export class CreateMentorDto {
 
   @IsNumber()
   @IsOptional()
-  accessAttempt?: number
+  accessAttempt?: number;
 
   @IsBoolean()
   @IsOptional()
   @IsNotEmpty()
   registerComplete?: boolean;
+
+  @IsOptional()
+  @IsString()
+  defaultProfile?: string;
 }

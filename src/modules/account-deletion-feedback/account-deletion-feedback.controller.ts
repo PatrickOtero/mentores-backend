@@ -22,7 +22,7 @@ export class AccountDeletionFeedbackController {
     const data = {
       ...formData,
       mentor_id: mentor.id,
-    }
+    };
     return this.accountDeletionFeedbackCreateService.execute(data);
   }
 }

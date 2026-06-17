@@ -9,6 +9,7 @@ import { UserModule } from '../user/user.module';
 import { MentorModule } from '../mentors/mentor.module';
 import HashAdapter from 'src/lib/adapter/hash/hashAdapter';
 import { CalendlyModule } from '../calendly/calendly.module';
+import { DeleteAccountService } from './services/delete-account.service';
 
 @Module({
   imports: [
@@ -25,11 +26,12 @@ import { CalendlyModule } from '../calendly/calendly.module';
   controllers: [AuthController],
   providers: [
     AuthService,
+    DeleteAccountService,
     JwtStrategy,
     {
-      provide: "IHashAdapter",
-      useClass: HashAdapter
-    }
+      provide: 'IHashAdapter',
+      useClass: HashAdapter,
+    },
   ],
   exports: [JwtModule],
 })

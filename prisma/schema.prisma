@@ -9,7 +9,7 @@ datasource db {
 
 model mentors {
   id               String         @id @default(uuid())
-  history          history?
+  history          history[]
   fullName         String
   dateOfBirth      DateTime
   password         String
@@ -24,6 +24,8 @@ model mentors {
   profileKey       String?
   accessAttempt    Int?           @default(0)
   code             String?        @unique
+  defaultProfile   String?
+  isProfilePaused  Boolean        @default(false)
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @default(now())
   deleted          Boolean        @default(false)
@@ -32,6 +34,7 @@ model mentors {
   calendlyInfo     calendlyInfo?  @relation("MentorCalendlyInfo")
   deactivatedAt DateTime?
   accountDeletionFeedback accountDeletionFeedback?
+  mentorshipFeedbacks mentorshipFeedback[]
 
   @@index([id])
 }
@@ -56,28 +59,79 @@ model users {
   password       String
   gender         String?
   aboutMe        String?
+  copiedAboutMeFromMentor Boolean @default(false)
+  specialties    String[]  @default([])
+  registerComplete Boolean @default(false)
   email          String    @unique
   emailConfirmed Boolean   @default(false)
   profile        String?
   profileKey     String?
+  copiedProfileFromMentor Boolean @default(false)
   accessAttempt  Int?      @default(0)
   code           String?   @unique
+  defaultProfile String?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @default(now())
   deleted        Boolean   @default(false)
+  deactivatedDays Int      @default(0)
+  deactivatedAt  DateTime?
   history        history[]
+  mentorshipFeedbacks mentorshipFeedback[]
 
   @@index([id])
 }
 
 model history {
   id          String  @id @default(uuid())
-  mentee_id   String  @unique
-  mentor_id   String  @unique
+  mentee_id   String
+  mentor_id   String
   users       users   @relation(fields: [mentee_id], references: [id])
   mentors     mentors @relation(fields: [mentor_id], references: [id])
+  status      String  @default("COMPLETED")
   duration    String?
   happened_at String  @default("")
+  eventName   String?
+  description String?
+  joinUrl     String?
+  cancelUrl   String?
+  rescheduleUrl String?
+  timezone    String?
+  schedulingUrl String?
+  inviteeName String?
+  inviteeEmail String @default("")
+  startTime   DateTime?
+  endTime     DateTime?
+  calendlyEventUri String? @unique
+  calendlyEventUuid String? @unique
+  calendlyInviteeUri String?
+  feedbackRequestedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  mentorshipFeedback mentorshipFeedback?
+
+  @@index([mentee_id, endTime])
+  @@index([mentor_id, endTime])
+}
+
+model mentorshipFeedback {
+  id                       String   @id @default(uuid())
+  history_id               String   @unique
+  mentor_id                String
+  mentee_id                String
+  mentoringRating          Int
+  mentorClarityRating      Int
+  mentorSupportRating      Int
+  goalProgressRating       Int
+  platformExperienceRating Int
+  comment                  String?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  history                  history  @relation(fields: [history_id], references: [id], onDelete: Cascade)
+  mentor                   mentors  @relation(fields: [mentor_id], references: [id], onDelete: Cascade)
+  mentee                   users    @relation(fields: [mentee_id], references: [id], onDelete: Cascade)
+
+  @@index([mentee_id, createdAt])
+  @@index([mentor_id, createdAt])
 }
 
 model testimony {

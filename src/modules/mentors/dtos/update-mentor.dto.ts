@@ -97,6 +97,10 @@ export class UpdateMentorDto {
 
   @IsOptional()
   @IsString()
+  password?: string;
+
+  @IsOptional()
+  @IsString()
   @IsNotEmpty({ message: "the 'calendlyName' field must not be empty" })
   @MaxLength(50, { message: 'Maximum of 100 characters exceeded' })
   @ApiProperty({
@@ -168,7 +172,22 @@ export class UpdateMentorDto {
   @ApiProperty({
     description: "Days of mentor's account deactivation.",
   })
-  deactivatedDays?: number
+  deactivatedDays?: number;
+
+  @IsOptional()
+  deactivatedAt?: Date | null;
+
+  @IsOptional()
+  @IsBoolean()
+  deleted?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  emailConfirmed?: boolean;
+
+  @IsOptional()
+  @IsString()
+  defaultProfile?: string;
 
   @IsOptional()
   file?: any;

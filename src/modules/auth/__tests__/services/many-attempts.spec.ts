@@ -1,14 +1,16 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { MailService } from 'src/modules/mails/mail.service';
 import { MentorRepository } from 'src/modules/mentors/repository/mentor.repository';
 import { UserRepository } from 'src/modules/user/user.repository';
-import { MailService } from 'src/modules/mails/mail.service';
-import * as bcrypt from 'bcrypt';
+import { CalendlyRepository } from 'src/modules/calendly/repository/calendly.repository';
+import IHashAdapter from 'src/lib/adapter/hash/hashAdapterInterface';
 import { AuthService } from '../../services/auth.service';
 import { InfoEntity } from '../../entity/info.entity';
 import { InfoLoginDto } from '../../dtos/info-login.dto';
 import { LoginTypeEnum } from '../../enums/login-type.enum';
-import { HttpException, HttpStatus } from '@nestjs/common';
-import { CalendlyRepository } from 'src/modules/calendly/repository/calendly.repository';
+import { AuthErrorCodeEnum } from '../../enums/auth-error-code.enum';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -17,25 +19,35 @@ describe('AuthService', () => {
   let jwtService: JwtService;
   let mailService: MailService;
   let calendlyRepository: CalendlyRepository;
+  let hashAdapter: IHashAdapter;
 
   beforeEach(() => {
     mentorRepository = {
-      findMentorByEmail: jest.fn(),
-      updateMentor: jest.fn(),
+      findMentorByEmail: vi.fn(),
+      updateMentor: vi.fn(),
     } as any;
 
     userRepository = {
-      findUserByEmail: jest.fn(),
-      updateUser: jest.fn(),
+      findUserByEmail: vi.fn(),
+      updateUser: vi.fn(),
     } as any;
 
     jwtService = {
-      sign: jest.fn(),
+      sign: vi.fn(),
     } as any;
 
     mailService = {
-      mentorSendCreationConfirmation: jest.fn(),
-      userSendCreationConfirmation: jest.fn(),
+      mentorSendCreationConfirmation: vi.fn(),
+      userSendCreationConfirmation: vi.fn(),
+    } as any;
+
+    calendlyRepository = {
+      getCalendlyInfoByMentorId: vi.fn(),
+    } as any;
+
+    hashAdapter = {
+      compareHash: vi.fn(),
+      createHash: vi.fn(),
     } as any;
 
     authService = new AuthService(
@@ -44,14 +56,15 @@ describe('AuthService', () => {
       userRepository,
       jwtService,
       mailService,
+      hashAdapter,
     );
   });
 
-  it('Should throw error if password is invalid and number of attempts is superior to 5', async () => {
+  it('should keep a blocked account blocked after five incorrect attempts', async () => {
     const mockInfo: InfoEntity = {
       id: '1',
       email: 'mentor@example.com',
-      password: 'hashedpassword',
+      password: 'hashed-password',
       emailConfirmed: true,
       dateOfBirth: '1990-01-01',
       fullName: 'Test Mentor',
@@ -60,22 +73,29 @@ describe('AuthService', () => {
     };
 
     const loginData: InfoLoginDto = {
-      email: 'mentor@example.com',
-      password: 'wrongpassword',
-      type: LoginTypeEnum.USER,
+      email: mockInfo.email,
+      password: 'wrong-password',
+      type: LoginTypeEnum.MENTOR,
     };
 
-    mentorRepository.findMentorByEmail = jest.fn().mockResolvedValue(mockInfo);
-    jest.spyOn(bcrypt, 'compare').mockResolvedValue(false as never);
-
-    expect(authService.execute(loginData)).rejects.toThrowError(
-      new HttpException(
-        {
-          message:
-            "Your account access is still blocked, because you dont redefined your password after five incorrect tries, please, click on 'Forgot my password' to begin the account restoration.",
-        },
-        HttpStatus.NOT_FOUND,
-      ),
+    vi.mocked(mentorRepository.findMentorByEmail).mockResolvedValue(
+      mockInfo as any,
     );
+    vi.mocked(hashAdapter.compareHash).mockResolvedValue(false);
+
+    try {
+      await authService.execute(loginData);
+      throw new Error('Expected a blocked account error');
+    } catch (error) {
+      expect(error).toBeInstanceOf(HttpException);
+      expect((error as HttpException).getStatus()).toBe(HttpStatus.NOT_FOUND);
+      expect((error as HttpException).getResponse()).toEqual({
+        code: AuthErrorCodeEnum.ACCOUNT_BLOCKED,
+        message:
+          "Your account access is still blocked, because you dont redefined your password after five incorrect tries, please, click on 'Forgot my password' to begin the account restoration.",
+      });
+    }
+
+    expect(mentorRepository.updateMentor).not.toHaveBeenCalled();
   });
 });

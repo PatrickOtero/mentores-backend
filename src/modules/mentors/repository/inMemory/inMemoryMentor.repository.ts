@@ -1,22 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { MentorEntity } from '../../entities/mentor.entity';
-import { CreateMentorDto } from '../../dtos/create-mentor.dto';
-import { UpdateMentorDto } from '../../dtos/update-mentor.dto';
 
 @Injectable()
 export class InMemoryMentorRepository {
   public mentors: MentorEntity[] = [];
   private idCounter = 1;
   constructor() {}
-  async createNewMentor(data: CreateMentorDto): Promise<MentorEntity> {
-    const newMentor: MentorEntity = {
+  async createNewMentor(data: Partial<MentorEntity>): Promise<MentorEntity> {
+    const newMentor = {
       id: String(this.idCounter++),
       ...data,
       deleted: false,
       createdAt: new Date(),
       updatedAt: new Date(),
       registerComplete: false,
-    };
+    } as MentorEntity;
     this.mentors.push(newMentor);
     return newMentor;
   }
@@ -47,7 +45,8 @@ export class InMemoryMentorRepository {
 
   async findMentorById(id: string) {
     const mentor = this.mentors.find(
-      (mentor) => mentor.id === id);
+      (mentor) => mentor.id === id && !mentor.deleted,
+    );
 
     if (!mentor) return null;
 
@@ -104,7 +103,7 @@ export class InMemoryMentorRepository {
     return mentor || null;
   }
 
-  async updateMentor(id: string, data: UpdateMentorDto): Promise<void> {
+  async updateMentor(id: string, data: Partial<MentorEntity>): Promise<void> {
     const mentor = this.mentors.find((mentor) => mentor.id === id);
     if (mentor) {
       Object.assign(mentor, data);
@@ -128,4 +127,3 @@ export class InMemoryMentorRepository {
     }
   }
 }
-

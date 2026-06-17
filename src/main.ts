@@ -9,7 +9,7 @@ import { json } from 'express';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const corsOrigins = process.env.CORS_ORIGINS?.split(',')
-    .map(origin => origin.trim())
+    .map((origin) => origin.trim())
     .filter(Boolean);
 
   app.enableCors({

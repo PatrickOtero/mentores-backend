@@ -16,7 +16,6 @@ export class ActivateMentorService {
       };
     }
 
-
     mentorExists.code = null;
     mentorExists.emailConfirmed = true;
 

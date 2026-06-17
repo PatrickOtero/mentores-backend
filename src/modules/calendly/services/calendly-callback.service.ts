@@ -1,13 +1,16 @@
-import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CalendlyRepository } from '../repository/calendly.repository';
 import { IHttpAdapter } from '../../../lib/adapter/httpAdapterInterface';
-
 
 @Injectable()
 export class OAuthCallbackService {
   constructor(
     private readonly calendlyRepository: CalendlyRepository,
-    @Inject("IHttpAdapter") private readonly httpAdapter: IHttpAdapter
+    @Inject('IHttpAdapter') private readonly httpAdapter: IHttpAdapter,
   ) {}
 
   async execute(code: string, mentorId: string) {

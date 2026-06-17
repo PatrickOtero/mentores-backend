@@ -1,12 +1,14 @@
 import { FileUploadService } from '../../upload.service';
-import { Logger } from "@nestjs/common";
+import { Logger } from '@nestjs/common';
 
 // Mock da implementação do S3
 jest.mock('aws-sdk', () => {
   return {
     S3: jest.fn(() => ({
       upload: jest.fn((params, callback) => {
-        callback(null, { Location: 'https://s3.amazonaws.com/bucket/file.txt' });
+        callback(null, {
+          Location: 'https://s3.amazonaws.com/bucket/file.txt',
+        });
       }),
     })),
   };
@@ -58,7 +60,9 @@ describe('FileUploadService', () => {
 
     jest.spyOn(Logger, 'error').mockImplementation(() => {});
 
-    await expect(fileUploadService.uploadS3(file, bucket, name, 'text/plain')).rejects.toEqual('Upload failed');
+    await expect(
+      fileUploadService.uploadS3(file, bucket, name, 'text/plain'),
+    ).rejects.toEqual('Upload failed');
 
     expect(fileUploadService.s3.upload).toHaveBeenCalled();
   });
