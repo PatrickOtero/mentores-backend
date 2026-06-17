@@ -210,8 +210,7 @@ describe('FetchSchedulesService', () => {
         endTime: '2099-06-12T18:30:00.000Z',
         duration: '30 minutes',
         joinUrl: 'https://meet.example.com/upcoming',
-        eventUrl:
-          'https://calendly.com/app/scheduled_events/user/me?period=upcoming&uuid=upcoming-event-1',
+        eventUrl: 'https://calendly.com/reschedule/upcoming-event-1',
         cancelUrl: 'https://calendly.com/cancel/upcoming-event-1',
         rescheduleUrl: 'https://calendly.com/reschedule/upcoming-event-1',
         status: 'scheduled',
@@ -449,6 +448,139 @@ describe('FetchSchedulesService', () => {
       'upcoming-event-1',
       'completed-event-1',
     ]);
+  });
+
+  it('should deduplicate the same Calendly event returned by different mentor connections', async () => {
+    vi.mocked(userRepository.findUserByEmail).mockResolvedValue({
+      id: 'mentee-1',
+      fullName: 'Mentorado',
+      email: 'mentee@example.com',
+      deleted: false,
+    } as any);
+    vi.mocked(
+      syncMentorshipHistoryService.syncMenteeSessionsByEmail,
+    ).mockResolvedValue(undefined);
+    vi.mocked(
+      calendlyRepository.getConnectedCalendlySyncInfos,
+    ).mockResolvedValue([
+      {
+        mentorId: 'mentor-mike',
+        calendlyUserUuid: 'shared-calendly-uuid',
+        calendlyAccessToken: 'shared-token-1',
+        accessTokenExpiration: null,
+        mentor: {
+          id: 'mentor-mike',
+          fullName: 'Mike Baguncinha',
+          email: 'mike@example.com',
+        },
+      },
+      {
+        mentorId: 'mentor-minelis',
+        calendlyUserUuid: 'shared-calendly-uuid',
+        calendlyAccessToken: 'shared-token-2',
+        accessTokenExpiration: null,
+        mentor: {
+          id: 'mentor-minelis',
+          fullName: 'Minelis',
+          email: 'minelis@example.com',
+        },
+      },
+    ] as any);
+    vi.mocked(
+      mentorshipFeedbackRepository.findMenteeScheduleHistory,
+    ).mockResolvedValue([
+      {
+        id: 'history-scheduled-1',
+        status: 'SCHEDULED',
+        calendlyEventUuid: 'shared-event-1',
+        calendlyEventUri:
+          'https://api.calendly.com/scheduled_events/shared-event-1',
+        eventName: 'Vai tomando!',
+        description: 'Me ensina liderança ai',
+        startTime: '2099-06-12T13:00:00.000Z',
+        endTime: '2099-06-12T13:30:00.000Z',
+        duration: '30 minutes',
+        joinUrl: '',
+        cancelUrl: 'https://calendly.com/cancel/shared-event-1',
+        rescheduleUrl: 'https://calendly.com/reschedule/shared-event-1',
+        mentors: {
+          id: 'mentor-mike',
+          fullName: 'Mike Baguncinha',
+        },
+      },
+    ] as any);
+    vi.mocked(
+      mentorshipFeedbackRepository.upsertHistorySession,
+    ).mockResolvedValue({
+      id: 'history-scheduled-1',
+      calendlyEventUuid: 'shared-event-1',
+      calendlyEventUri:
+        'https://api.calendly.com/scheduled_events/shared-event-1',
+      eventName: 'Vai tomando!',
+      description: 'Me ensina liderança ai',
+      startTime: '2099-06-12T13:00:00.000Z',
+      endTime: '2099-06-12T13:30:00.000Z',
+      duration: '30 minutes',
+      joinUrl: '',
+      cancelUrl: 'https://calendly.com/cancel/shared-event-1',
+      rescheduleUrl: 'https://calendly.com/reschedule/shared-event-1',
+    } as any);
+
+    vi.mocked(httpAdapter.get).mockImplementation(async (url) => {
+      if (url.includes('/scheduled_events?')) {
+        return {
+          collection: [
+            {
+              uri: 'https://api.calendly.com/scheduled_events/shared-event-1',
+              name: 'Vai tomando!',
+              description: 'Vai tomando!',
+              start_time: '2099-06-12T13:00:00.000Z',
+              end_time: '2099-06-12T13:30:00.000Z',
+              location: {},
+            },
+          ],
+        } as any;
+      }
+
+      if (url.includes('/invitees')) {
+        return {
+          collection: [
+            {
+              uri: 'https://api.calendly.com/scheduled_events/shared-event-1/invitees/invitee-1',
+              name: 'Mentorado',
+              email: 'mentee@example.com',
+              cancel_url: 'https://calendly.com/cancel/shared-event-1',
+              reschedule_url: 'https://calendly.com/reschedule/shared-event-1',
+              questions_and_answers: [
+                {
+                  question: 'O que deseja abordar?',
+                  answer: 'Me ensina liderança ai',
+                },
+              ],
+            },
+          ],
+        } as any;
+      }
+
+      throw new Error(`Unexpected url: ${url}`);
+    });
+
+    const result = await service.getMenteeSchedules({
+      id: 'mentee-1',
+      email: 'mentee@example.com',
+    } as any);
+
+    expect(result).toHaveLength(1);
+    expect(result[0]).toEqual(
+      expect.objectContaining({
+        eventUuid: 'shared-event-1',
+        eventUrl: 'https://calendly.com/reschedule/shared-event-1',
+        mentor: {
+          id: 'mentor-mike',
+          fullName: 'Mike Baguncinha',
+        },
+      }),
+    );
   });
 
   it('should block access when the active profile is not the mentee profile', async () => {

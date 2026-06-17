@@ -127,9 +127,14 @@ export class FetchSchedulesService {
         endTime: session.endTime,
         duration: session.duration || '',
         joinUrl: session.joinUrl || '',
-        eventUrl: this.buildMenteeEventUrl(status, session.calendlyEventUuid),
         cancelUrl: session.cancelUrl || '',
         rescheduleUrl: session.rescheduleUrl || '',
+        eventUrl: this.resolveMenteeEventUrl({
+          status,
+          calendlyEventUuid: session.calendlyEventUuid,
+          cancelUrl: session.cancelUrl,
+          rescheduleUrl: session.rescheduleUrl,
+        }),
         status,
         mentor: {
           id: session.mentors.id,
@@ -186,10 +191,10 @@ export class FetchSchedulesService {
     );
 
     const primarySchedule =
-      incomingPriority >= currentPriority ? incomingSchedule : currentSchedule;
+      incomingPriority > currentPriority ? incomingSchedule : currentSchedule;
 
     const secondarySchedule =
-      incomingPriority >= currentPriority ? currentSchedule : incomingSchedule;
+      incomingPriority > currentPriority ? currentSchedule : incomingSchedule;
 
     return {
       ...secondarySchedule,
@@ -413,13 +418,16 @@ export class FetchSchedulesService {
           persistedSession.duration ||
           this.calculateDuration(event.start_time, event.end_time),
         joinUrl: persistedSession.joinUrl || event.location?.join_url || '',
-        eventUrl: this.buildMenteeEventUrl(
-          'scheduled',
-          persistedSession.calendlyEventUuid || eventId,
-        ),
         cancelUrl: persistedSession.cancelUrl || invitee.cancel_url || '',
         rescheduleUrl:
           persistedSession.rescheduleUrl || invitee.reschedule_url || '',
+        eventUrl: this.resolveMenteeEventUrl({
+          status: 'scheduled',
+          calendlyEventUuid: persistedSession.calendlyEventUuid || eventId,
+          cancelUrl: persistedSession.cancelUrl || invitee.cancel_url || '',
+          rescheduleUrl:
+            persistedSession.rescheduleUrl || invitee.reschedule_url || '',
+        }),
         status: 'scheduled',
         mentor: {
           id: calendlyInfo.mentorId,
@@ -472,10 +480,25 @@ export class FetchSchedulesService {
     return 'scheduled' as const;
   }
 
-  private buildMenteeEventUrl(
-    status: MenteeSchedule['status'],
-    calendlyEventUuid?: string | null,
-  ) {
+  private resolveMenteeEventUrl({
+    status,
+    calendlyEventUuid,
+    cancelUrl,
+    rescheduleUrl,
+  }: {
+    status: MenteeSchedule['status'];
+    calendlyEventUuid?: string | null;
+    cancelUrl?: string | null;
+    rescheduleUrl?: string | null;
+  }) {
+    if (rescheduleUrl) {
+      return rescheduleUrl;
+    }
+
+    if (cancelUrl) {
+      return cancelUrl;
+    }
+
     if (!calendlyEventUuid) {
       return '';
     }
@@ -497,6 +520,10 @@ export class FetchSchedulesService {
   }
 
   private buildScheduleKey(schedule: MenteeSchedule) {
+    if (schedule.eventUuid) {
+      return `event:${schedule.eventUuid}`;
+    }
+
     return `${schedule.mentor.id}:${this.normalizeDateToMinute(
       schedule.startTime,
     )}`;
