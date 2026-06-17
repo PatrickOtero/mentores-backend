@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../user.repository';
-import { UpdateUserDto } from '../dto/update-user.dto';
 import { CustomBadRequestException } from '../../../shared/exceptions/badRequest.exception';
 import { FileUploadService } from '../../upload/upload.service';
+import { UserEntity } from '../entities/user.entity';
 
 @Injectable()
 export class UploadProfileImageService {
@@ -11,7 +11,7 @@ export class UploadProfileImageService {
     private fileUploadService: FileUploadService,
   ) {}
 
-  async execute(id: string, user: UpdateUserDto, file) {
+  async execute(id: string, user: UserEntity, file) {
     user.profileKey = 'genericUserImage';
     if (file && !user.profileKey) {
       throw new CustomBadRequestException(
@@ -27,9 +27,6 @@ export class UploadProfileImageService {
 
       await this.userRepository.updateUserUrl(id, user.profile);
     }
-
-    delete user.file;
-
     return {
       message: 'The profile image was updated succesfully',
       status: 200,

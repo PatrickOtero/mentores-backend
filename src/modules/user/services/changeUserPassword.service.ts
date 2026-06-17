@@ -1,0 +1,42 @@
+import * as bcrypt from 'bcrypt';
+import { Injectable } from '@nestjs/common';
+import { UserEntity } from '../entities/user.entity';
+import { UserRepository } from '../user.repository';
+import { UserChangePassDto } from '../dto/user-change-pass.dto';
+
+@Injectable()
+export class ChangeUserPasswordService {
+  constructor(private userRepository: UserRepository) {}
+
+  async execute(user: UserEntity, data: UserChangePassDto) {
+    const loggedUser = await this.userRepository.findFullUserById(user.id);
+
+    const isPassCorrect = await bcrypt.compare(
+      data.oldPassword,
+      loggedUser.password,
+    );
+
+    if (!isPassCorrect) {
+      return {
+        status: 400,
+        message: 'Incorrect old password',
+      };
+    }
+
+    loggedUser.password = await bcrypt.hash(data.password, 10);
+
+    try {
+      await this.userRepository.updateUser(user.id, loggedUser);
+
+      return {
+        status: 200,
+        message: 'Password changed successfully',
+      };
+    } catch (error) {
+      return {
+        status: 400,
+        message: 'Something went wrong in the database',
+      };
+    }
+  }
+}

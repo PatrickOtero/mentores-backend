@@ -8,7 +8,9 @@ export class AccountDeletionFeedbackRepository extends PrismaClient {
     try {
       await this.accountDeletionFeedback.create({ data });
     } catch (error) {
-      throw new Error(`Failed to create account deletion feedback: ${error.message}`);
+      throw new Error(
+        `Failed to create account deletion feedback: ${error.message}`,
+      );
     }
   }
 }

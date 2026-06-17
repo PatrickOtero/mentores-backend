@@ -50,6 +50,10 @@ import { SwaggerChangePassword } from '../../shared/Swagger/decorators/change-pa
 import { SwaggerUploadProfileImage } from '../../shared/Swagger/decorators/uploadProfileImage.swagger';
 import { ListAllRegisteredMentorsService } from './services/listAllRegisteredMentors.service';
 import { GetMentorBySingleQueryService } from './services/getMentorBySingleQuery.service';
+import { CreateMentorProfileService } from './services/createMentorProfile.service';
+import { PauseMentorProfileService } from './services/pauseMentorProfile.service';
+import { ReactivateMentorProfileService } from './services/reactivateMentorProfile.service';
+import { InfoEntity } from '../auth/entity/info.entity';
 
 @ApiTags('mentor')
 @Controller('mentor')
@@ -69,27 +73,44 @@ export class MentorController {
     private finishMentorRegisterService: FinishMentorRegisterService,
     private getRegisteredMentorsService: ListAllRegisteredMentorsService,
     private getMentorBySingleQueryService: GetMentorBySingleQueryService,
+    private createMentorProfileService: CreateMentorProfileService,
+    private pauseMentorProfileService: PauseMentorProfileService,
+    private reactivateMentorProfileService: ReactivateMentorProfileService,
   ) {}
 
   @Post()
   @SwaggerCreateMentor()
   async createMentor(
     @Body() createMentorDto: CreateMentorDto,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
-    const { message, statusCode } = await this.createMentorService.execute(createMentorDto);
+    const { message, statusCode } = await this.createMentorService.execute(
+      createMentorDto,
+    );
 
-    return res.json({ message: message }).status(statusCode)
+    return res.json({ message: message }).status(statusCode);
   }
 
   @ApiExcludeEndpoint()
   @Get()
-  async getAllMentors(
-    @Res() res: Response
-  ) {
+  async getAllMentors(@Res() res: Response) {
     const mentorsList = await this.listAllMentorsService.execute();
 
-    return res.json(mentorsList).status(200)
+    return res.json(mentorsList).status(200);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Post('profile')
+  async createMentorProfile(
+    @LoggedEntity() entity: MentorEntity,
+    @Res() res: Response,
+  ) {
+    const { status, data } = await this.createMentorProfileService.execute(
+      entity,
+    );
+
+    return res.status(status).send(data);
   }
 
   @Get('registered')
@@ -117,9 +138,7 @@ export class MentorController {
     @Res() res: Response,
     @Query('query') query: string,
   ) {
-    const data = await this.getMentorBySingleQueryService.execute(
-      query
-    );
+    const data = await this.getMentorBySingleQueryService.execute(query);
 
     return res.status(HttpStatus.OK).json(data);
   }
@@ -190,11 +209,37 @@ export class MentorController {
 
   @ApiExcludeEndpoint()
   @UseGuards(AuthGuard())
-  @Patch("delete-mentor")
-  async deleteMentor(
-    @LoggedEntity() mentor: MentorEntity
+  @Patch('delete-mentor')
+  async deleteMentor(@LoggedEntity() entity: InfoEntity) {
+    return this.deleteMentorService.execute(entity.email);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Patch('pause-profile')
+  async pauseMentorProfile(
+    @LoggedEntity() entity: InfoEntity,
+    @Res() res: Response,
   ) {
-    return this.deleteMentorService.execute(mentor);
+    const { status, data } = await this.pauseMentorProfileService.execute(
+      entity.email,
+    );
+
+    return res.status(status).send(data);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Patch('reactivate-profile')
+  async reactivateMentorProfile(
+    @LoggedEntity() entity: InfoEntity,
+    @Res() res: Response,
+  ) {
+    const { status, data } = await this.reactivateMentorProfileService.execute(
+      entity.email,
+    );
+
+    return res.status(status).send(data);
   }
 
   @SwaggerRestoreAccountEmail()

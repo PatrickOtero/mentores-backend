@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { handleError } from '../../../shared/utils/handle-error.util';
-import { CreateMentorDto } from '../dtos/create-mentor.dto';
-import { UpdateMentorDto } from '../dtos/update-mentor.dto';
 import { MentorEntity } from '../entities/mentor.entity';
 
 @Injectable()
@@ -17,43 +15,52 @@ export class MentorRepository extends PrismaClient {
       .catch(handleError);
   }
 
-  async createNewMentor(data: CreateMentorDto): Promise<MentorEntity> {
-    return this.mentors.create({ data }).catch(handleError);
+  async createNewMentor(data: Partial<MentorEntity>): Promise<MentorEntity> {
+    return this.mentors.create({ data: data as any }).catch(handleError);
   }
 
   async findAllMentors(): Promise<MentorEntity[]> {
-    return this.mentors.findMany({
-      select: {
-        id: true,
-        fullName: true,
-        email: true,
-        gender: true,
-        aboutMe: true,
-        profile: true,
-        profileKey: true,
-        specialties: true,
-        role: true,
-        dateOfBirth: true,
-        emailConfirmed: true,
-        registerComplete: true,
-        accessAttempt: true,
-        code: true,
-        deleted: true,
-        calendlyInfo: true,
-        history: true,
-        testimony: true,
-        createdAt: true,
-        updatedAt: true
-      },
-      where: {
-        deleted: false
-      }
-    }).catch(handleError);
+    return this.mentors
+      .findMany({
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          gender: true,
+          aboutMe: true,
+          profile: true,
+          profileKey: true,
+          specialties: true,
+          role: true,
+          dateOfBirth: true,
+          emailConfirmed: true,
+          registerComplete: true,
+          accessAttempt: true,
+          code: true,
+          deleted: true,
+          calendlyInfo: true,
+          history: true,
+          testimony: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+        where: {
+          deleted: false,
+          isProfilePaused: false,
+        },
+      })
+      .catch(handleError);
   }
 
   async findAllRegisteredMentors(): Promise<MentorEntity[]> {
     return this.mentors
-      .findMany({ where: { registerComplete: true, deleted: false } })
+      .findMany({
+        where: {
+          registerComplete: true,
+          deleted: false,
+          isProfilePaused: false,
+        },
+      })
       .catch(handleError);
   }
 
@@ -88,6 +95,7 @@ export class MentorRepository extends PrismaClient {
           profileKey: true,
           aboutMe: true,
           registerComplete: true,
+          isProfilePaused: true,
           deleted: true,
           createdAt: true,
           updatedAt: true,
@@ -115,6 +123,7 @@ export class MentorRepository extends PrismaClient {
         },
         where: {
           deleted: false,
+          isProfilePaused: false,
           OR: [
             { specialties: { has: specialty } },
             {
@@ -131,36 +140,37 @@ export class MentorRepository extends PrismaClient {
   }
 
   async findMentorsBySingleQuery(query: string): Promise<MentorEntity[]> {
-  return this.mentors.findMany({
-    select: {
-      id: true,
-      fullName: true,
-      dateOfBirth: true,
-      email: true,
-      specialties: true,
-      gender: true,
-      profile: true,
-      profileKey: true,
-      aboutMe: true,
-    },
-    where: {
-      deleted: false,
-      OR: [
-        {
-          fullName: {
-            contains: query,
-            mode: 'insensitive',
+    return this.mentors.findMany({
+      select: {
+        id: true,
+        fullName: true,
+        dateOfBirth: true,
+        email: true,
+        specialties: true,
+        gender: true,
+        profile: true,
+        profileKey: true,
+        aboutMe: true,
+      },
+      where: {
+        deleted: false,
+        isProfilePaused: false,
+        OR: [
+          {
+            fullName: {
+              contains: query,
+              mode: 'insensitive',
+            },
           },
-        },
-        {
-          specialties: {
-            has: query,
+          {
+            specialties: {
+              has: query,
+            },
           },
-        },
-      ],
-    },
-  });
-}
+        ],
+      },
+    });
+  }
 
   async deactivateMentorById(id: string): Promise<MentorEntity> {
     return this.mentors
@@ -170,15 +180,19 @@ export class MentorRepository extends PrismaClient {
         },
         data: {
           deleted: true,
+          isProfilePaused: false,
           updatedAt: new Date(),
-          deactivatedAt: new Date(),
+          deactivatedDays: 0,
+          deactivatedAt: null,
         },
       })
       .catch(handleError);
   }
 
-  async updateMentor(id: string, data: UpdateMentorDto): Promise<void> {
-    await this.mentors.update({ where: { id }, data }).catch(handleError);
+  async updateMentor(id: string, data: Partial<MentorEntity>): Promise<void> {
+    await this.mentors
+      .update({ where: { id }, data: data as any })
+      .catch(handleError);
   }
 
   async updateMentorUrl(id: string, urlImage: string): Promise<void> {
@@ -192,51 +206,4 @@ export class MentorRepository extends PrismaClient {
       .update({ where: { id }, data: { registerComplete: true } })
       .catch(handleError);
   }
-
-  async findExpiredMentorsAndDelete(): Promise<void> {
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const expiredMentors = await this.mentors.findMany({
-      where: {
-        deleted: true,
-        deactivatedAt: {
-          lte: thirtyDaysAgo, //let == menor ou igual a
-        },
-      },
-    });
-
-    if (expiredMentors.length > 0) {
-      const idsToDelete = expiredMentors.map((mentor) => mentor.id);
-
-      await this.mentors.deleteMany({
-        where: {
-          id: {
-            in: idsToDelete,
-          },
-        },
-      });
-      console.log(`${idsToDelete.length} mentores expirados foram excluídos permanentemente.`);
-    }
-
-  }
-
-  async findMentorsDeactivatedFor(days: number): Promise<MentorEntity[]> {
-  const targetDate = new Date();
-  targetDate.setDate(targetDate.getDate() - days);
-
-  const startDate = new Date(targetDate.setHours(0, 0, 0, 0)); // Início do dia
-  const endDate = new Date(targetDate.setHours(23, 59, 59, 999)); // Fim do dia
-
-  return this.mentors.findMany({
-    where: {
-      deleted: true,
-      deactivatedAt: {
-        gte: startDate, // Maior ou igual ao início do dia
-        lte: endDate,   // Menor ou igual ao fim do dia
-      },
-    },
-  });
 }
-}
-

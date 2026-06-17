@@ -1,53 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AuthGuard, PassportModule } from '@nestjs/passport';
-import { MailService } from 'src/modules/mails/mail.service';
-import { JwtService } from '@nestjs/jwt';
-import { MentorRepository } from 'src/modules/mentors/repository/mentor.repository';
-import { UserRepository } from 'src/modules/user/user.repository';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { AuthController } from '../../auth.controller';
-import { AuthService } from '../../services/auth.service';
-import { LoginTypeEnum } from '../../enums/login-type.enum';
-import { InfoLoginDto } from '../../dtos/info-login.dto';
-import { InfoEntity } from '../../entity/info.entity';
 import { MentorEntity } from 'src/modules/mentors/entities/mentor.entity';
 
 describe('Auth Controller Tests', () => {
-  let module: TestingModule;
   let controller: AuthController;
-  let authService: AuthService;
 
-  beforeEach(async () => {
-    module = await Test.createTestingModule({
-      imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
-      controllers: [AuthController],
-      providers: [
-        AuthService,
-        {
-          provide: MailService,
-          useValue: { sendMail: jest.fn() },
-        },
-        {
-          provide: JwtService,
-          useValue: { sign: jest.fn(), verify: jest.fn() },
-        },
-        {
-          provide: MentorRepository,
-          useValue: {},
-        },
-        {
-          provide: UserRepository,
-          useValue: {},
-        },
-      ],
-    })
-      .overrideGuard(AuthGuard)
-      .useValue({
-        canActivate: jest.fn(() => true),
-      })
-      .compile();
-
-    controller = module.get<AuthController>(AuthController);
-    authService = module.get<AuthService>(AuthService);
+  beforeEach(() => {
+    controller = new AuthController({} as any);
   });
 
   it('should return the logged mentor', async () => {

@@ -1,14 +1,15 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { InfoEntity } from '../../entity/info.entity';
-import { AuthService } from '../../services/auth.service';
+import { JwtService } from '@nestjs/jwt';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import IHashAdapter from 'src/lib/adapter/hash/hashAdapterInterface';
+import { CalendlyRepository } from 'src/modules/calendly/repository/calendly.repository';
+import { MailService } from 'src/modules/mails/mail.service';
 import { MentorRepository } from 'src/modules/mentors/repository/mentor.repository';
 import { UserRepository } from 'src/modules/user/user.repository';
-import { JwtService } from '@nestjs/jwt';
-import { MailService } from 'src/modules/mails/mail.service';
 import { LoginTypeEnum } from '../../enums/login-type.enum';
-import { CalendlyRepository } from 'src/modules/calendly/repository/calendly.repository';
-import { vi } from 'vitest';
-import IHashAdapter from 'src/lib/adapter/hash/hashAdapterInterface';
+import { AuthErrorCodeEnum } from '../../enums/auth-error-code.enum';
+import { InfoEntity } from '../../entity/info.entity';
+import { AuthService } from '../../services/auth.service';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -59,7 +60,7 @@ describe('AuthService', () => {
   });
 
   describe('infoConfirm', () => {
-    it('should allow a deleted account to log in during the grace period', async () => {
+    it('should reject login for a deleted mentor profile immediately', async () => {
       const mockInfo: InfoEntity = {
         id: '1',
         email: 'mentor@example.com',
@@ -76,33 +77,28 @@ describe('AuthService', () => {
       vi.mocked(mentorRepository.findMentorByEmail).mockResolvedValue(
         mockInfo as any,
       );
-      vi.mocked(hashAdapter.compareHash).mockResolvedValue(true);
-      vi.mocked(jwtService.sign).mockReturnValue('mocked-token' as never);
-      vi.mocked(calendlyRepository.getCalendlyInfoByMentorId).mockResolvedValue(
-        null,
-      );
 
-      const result = await authService.execute({
-        email: mockInfo.email,
-        password: 'Password@123',
-        type: LoginTypeEnum.USER,
-      });
-
-      expect(mentorRepository.updateMentor).toHaveBeenCalledWith(
-        mockInfo.id,
-        expect.objectContaining({
-          deleted: false,
-          deactivatedDays: 0,
-          deactivatedAt: null,
+      await expect(
+        authService.execute({
+          email: mockInfo.email,
+          password: 'Password@123',
+          type: LoginTypeEnum.MENTOR,
         }),
+      ).rejects.toThrow(
+        new HttpException(
+          {
+            code: AuthErrorCodeEnum.INVALID_CREDENTIALS,
+            message: 'invalid e-mail or password',
+          },
+          HttpStatus.NOT_FOUND,
+        ),
       );
-      expect(result.data.token).toBe('mocked-token');
+
+      expect(hashAdapter.compareHash).not.toHaveBeenCalled();
+      expect(mentorRepository.updateMentor).not.toHaveBeenCalled();
     });
 
-    it('should not reactivate a deleted account after the grace period', async () => {
-      const deactivatedAt = new Date();
-      deactivatedAt.setDate(deactivatedAt.getDate() - 31);
-
+    it('should keep rejecting deleted profiles regardless of deactivation metadata', async () => {
       const mockInfo: InfoEntity = {
         id: '1',
         email: 'mentor@example.com',
@@ -112,8 +108,8 @@ describe('AuthService', () => {
         fullName: 'Test Mentor',
         deleted: true,
         accessAttempt: 0,
-        deactivatedDays: 0,
-        deactivatedAt,
+        deactivatedDays: 45,
+        deactivatedAt: null,
       };
 
       vi.mocked(mentorRepository.findMentorByEmail).mockResolvedValue(
@@ -124,17 +120,19 @@ describe('AuthService', () => {
         authService.execute({
           email: mockInfo.email,
           password: 'Password@123',
-          type: LoginTypeEnum.USER,
+          type: LoginTypeEnum.MENTOR,
         }),
       ).rejects.toThrow(
         new HttpException(
-          { message: 'invalid e-mail or password' },
+          {
+            code: AuthErrorCodeEnum.INVALID_CREDENTIALS,
+            message: 'invalid e-mail or password',
+          },
           HttpStatus.NOT_FOUND,
         ),
       );
 
       expect(mentorRepository.updateMentor).not.toHaveBeenCalled();
     });
-    
   });
 });

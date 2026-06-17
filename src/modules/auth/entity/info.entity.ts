@@ -7,6 +7,7 @@ export class InfoEntity {
   deactivatedDays?: number;
   deactivatedAt?: Date | null | string;
   aboutMe?: string;
+  copiedAboutMeFromMentor?: boolean;
   gender?: string;
   email: string;
   emailConfirmed?: boolean;
@@ -15,7 +16,11 @@ export class InfoEntity {
   password?: string;
   profile?: string;
   profileKey?: string;
+  copiedProfileFromMentor?: boolean;
+  defaultProfile?: string;
+  isProfilePaused?: boolean;
+  registerComplete?: boolean;
   specialties?: string[];
   updatedAt?: string | Date;
-  calendlyName?: string
+  calendlyName?: string;
 }

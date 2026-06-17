@@ -1,0 +1,2 @@
+ALTER TABLE "mentors"
+ADD COLUMN "isProfilePaused" BOOLEAN NOT NULL DEFAULT false;

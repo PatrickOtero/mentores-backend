@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { MentorRepository } from '../repository/mentor.repository';
 import { MailService } from '../../../modules/mails/mail.service';
 import { GenerateCodeUtil } from '../../../shared/utils/generate-code.util';
+import { LoginTypeEnum } from '../../auth/enums/login-type.enum';
 
 @Injectable()
 export class CreateMentorService {
@@ -13,7 +14,9 @@ export class CreateMentorService {
     private mailService: MailService,
   ) {}
 
-  async execute(data: CreateMentorDto): Promise<{ message: string, statusCode: number }> {
+  async execute(
+    data: CreateMentorDto,
+  ): Promise<{ message: string; statusCode: number }> {
     data.dateOfBirth = new Date(data.dateOfBirth);
     const generateCodeUtil = new GenerateCodeUtil();
     const mentorAlreadyExists = await this.mentorRepository.findMentorByEmail(
@@ -26,6 +29,7 @@ export class CreateMentorService {
 
     data.password = await bcrypt.hash(data.password, 10);
     data.code = generateCodeUtil.create();
+    data.defaultProfile = LoginTypeEnum.MENTOR;
 
     const newMentor = await this.mentorRepository.createNewMentor(data);
 

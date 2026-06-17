@@ -1,0 +1,4 @@
+ALTER TABLE "users" ADD COLUMN "specialties" TEXT[] DEFAULT ARRAY[]::TEXT[];
+ALTER TABLE "users" ADD COLUMN "registerComplete" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "users" ADD COLUMN "deactivatedDays" INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE "users" ADD COLUMN "deactivatedAt" TIMESTAMP(3);

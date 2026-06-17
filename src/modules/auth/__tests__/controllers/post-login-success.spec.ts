@@ -1,65 +1,32 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AuthGuard, PassportModule } from '@nestjs/passport';
-import { MailService } from 'src/modules/mails/mail.service';
-import { JwtService } from '@nestjs/jwt';
-import { MentorRepository } from 'src/modules/mentors/repository/mentor.repository';
-import { UserRepository } from 'src/modules/user/user.repository';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthController } from '../../auth.controller';
-import { AuthService } from '../../services/auth.service';
-import { LoginTypeEnum } from '../../enums/login-type.enum';
 import { InfoLoginDto } from '../../dtos/info-login.dto';
+import { LoginTypeEnum } from '../../enums/login-type.enum';
 import { InfoEntity } from '../../entity/info.entity';
 
 describe('Auth Controller Tests', () => {
-  let module: TestingModule;
   let controller: AuthController;
-  let authService: AuthService;
+  let authService: { execute: ReturnType<typeof vi.fn> };
 
-  beforeEach(async () => {
-    module = await Test.createTestingModule({
-      imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
-      controllers: [AuthController],
-      providers: [
-        AuthService,
-        {
-          provide: MailService,
-          useValue: { sendMail: jest.fn() },
-        },
-        {
-          provide: JwtService,
-          useValue: { sign: jest.fn(), verify: jest.fn() },
-        },
-        {
-          provide: MentorRepository,
-          useValue: {},
-        },
-        {
-          provide: UserRepository,
-          useValue: {},
-        },
-      ],
-    })
-      .overrideGuard(AuthGuard)
-      .useValue({
-        canActivate: jest.fn(() => true),
-      })
-      .compile();
+  beforeEach(() => {
+    authService = {
+      execute: vi.fn(),
+    };
 
-    controller = module.get<AuthController>(AuthController);
-    authService = module.get<AuthService>(AuthService);
+    controller = new AuthController(authService as any);
   });
 
   it('Should be able to login', async () => {
     const loginData: InfoLoginDto = {
       email: 'example@example.com',
       password: 'password',
-      type: LoginTypeEnum.USER,
+      type: LoginTypeEnum.MENTOR,
     };
 
     const res = {
-        status: jest.fn().mockReturnThis(),
-        send: jest.fn(),
-      };
+      status: vi.fn().mockReturnThis(),
+      send: vi.fn(),
+    };
 
     const mockInfo: InfoEntity = {
       id: '1',
@@ -81,7 +48,7 @@ describe('Auth Controller Tests', () => {
       },
     };
 
-    jest.spyOn(authService, 'execute').mockResolvedValue(response);
+    authService.execute.mockResolvedValue(response);
     await controller.login(loginData, res as any);
 
     expect(authService.execute).toHaveBeenCalledWith(loginData);

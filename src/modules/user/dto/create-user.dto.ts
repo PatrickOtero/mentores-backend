@@ -91,4 +91,8 @@ export class CreateUserDto {
   @Exclude()
   @IsOptional()
   code: string;
+
+  @Exclude()
+  @IsOptional()
+  defaultProfile?: string;
 }

@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   Post,
   Body,
@@ -41,6 +42,14 @@ import { SendRestorationEmailService } from './services/sendRestorationEmail.ser
 import { SwaggerUploadProfileImage } from '../../shared/Swagger/decorators/uploadProfileImage.swagger';
 import { SwaggerCreateUser } from '../../shared/Swagger/decorators/user/create-user.swagger.decorator';
 import { NorthFlankTestMethod } from './services/northFlankTest.service';
+import { CreateUserProfileService } from './services/createUserProfile.service';
+import { CreateUserProfileDto } from './dto/create-user-profile.dto';
+import { ChangeUserPasswordService } from './services/changeUserPassword.service';
+import { DiscardUserProfileDraftService } from './services/discardUserProfileDraft.service';
+import { SyncUserProfileSharedFieldsDto } from './dto/sync-user-profile-shared-fields.dto';
+import { SyncUserProfileSharedFieldsService } from './services/syncUserProfileSharedFields.service';
+import { UserChangePassDto } from './dto/user-change-pass.dto';
+import { SwaggerChangePassword } from '../../shared/Swagger/decorators/change-password.swagger';
 
 @ApiTags('user')
 @Controller('user')
@@ -55,13 +64,59 @@ export class UserController {
     private sendRestorationEmailService: SendRestorationEmailService,
     private updateUserService: UpdateUserService,
     private uploadProfileImageService: UploadProfileImageService,
-    private northFlankTestMethod: NorthFlankTestMethod
+    private northFlankTestMethod: NorthFlankTestMethod,
+    private createUserProfileService: CreateUserProfileService,
+    private changeUserPasswordService: ChangeUserPasswordService,
+    private discardUserProfileDraftService: DiscardUserProfileDraftService,
+    private syncUserProfileSharedFieldsService: SyncUserProfileSharedFieldsService,
   ) {}
 
   @Post()
   @SwaggerCreateUser()
   create(@Body() createUserDto: CreateUserDto) {
     return this.createUserService.execute(createUserDto);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Post('profile')
+  async createUserProfile(
+    @LoggedEntity() user: UserEntity,
+    @Body() data: CreateUserProfileDto,
+    @Res() res: Response,
+  ) {
+    const { status, data: userProfile } =
+      await this.createUserProfileService.execute(user, data);
+
+    return res.status(status).send(userProfile);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Delete('profile/draft')
+  async discardUserProfileDraft(
+    @LoggedEntity() user: UserEntity,
+    @Res() res: Response,
+  ) {
+    const { status, data } = await this.discardUserProfileDraftService.execute(
+      user.email,
+    );
+
+    return res.status(status).send(data);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Patch('profile/shared-fields')
+  async syncUserProfileSharedFields(
+    @LoggedEntity() user: UserEntity,
+    @Body() data: SyncUserProfileSharedFieldsDto,
+    @Res() res: Response,
+  ) {
+    const { status, data: response } =
+      await this.syncUserProfileSharedFieldsService.execute(user.email, data);
+
+    return res.status(status).send(response);
   }
 
   @Patch('active')
@@ -83,6 +138,23 @@ export class UserController {
     const { status, data } = await this.getUserByIdService.execute(id);
 
     return res.status(status).send(data);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @SwaggerChangePassword()
+  @Put('change_password')
+  async changeUserPassword(
+    @LoggedEntity() user: UserEntity,
+    @Body() data: UserChangePassDto,
+    @Res() res: Response,
+  ) {
+    const { message, status } = await this.changeUserPasswordService.execute(
+      user,
+      data,
+    );
+
+    return res.status(status).json({ message });
   }
 
   @ApiBearerAuth()
@@ -109,9 +181,17 @@ export class UserController {
   }
 
   @ApiExcludeEndpoint()
+  @UseGuards(AuthGuard())
+  @Patch('delete-user')
+  async deleteUser(@LoggedEntity() user: UserEntity) {
+    return this.deactivateLoggedUserService.execute(user.email);
+  }
+
+  @ApiExcludeEndpoint()
   @Patch(':id')
   async desactivateLoggedEntity(@Param() { id }: GetByIdDto) {
-    return this.deactivateLoggedUserService.execute(id);
+    const user = await this.getUserByIdService.execute(id);
+    return this.deactivateLoggedUserService.execute(user.data.email);
   }
 
   @SwaggerRestoreAccountEmail()
