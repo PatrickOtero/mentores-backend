@@ -13,7 +13,8 @@ export class InitiateOAuthService {
       client_id: process.env.CALENDLY_CLIENT_ID,
       redirect_uri: process.env.CALENDLY_REDIRECT_URI,
       response_type: 'code',
-      scope: 'users:read event_types:read scheduled_events:read scheduled_events:write',
+      scope:
+        'users:read event_types:read scheduled_events:read scheduled_events:write',
       state: mentorId,
     });
 

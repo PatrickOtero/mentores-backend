@@ -6,11 +6,13 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtService } from '@nestjs/jwt';
 
 @Module({
-  imports: [
-      PassportModule.register({ defaultStrategy: 'jwt' }),
-  ],
+  imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
   controllers: [AccountDeletionFeedbackController],
-  providers: [AccountDeletionFeedbackCreateService, AccountDeletionFeedbackRepository, JwtService],
+  providers: [
+    AccountDeletionFeedbackCreateService,
+    AccountDeletionFeedbackRepository,
+    JwtService,
+  ],
 
   exports: [AccountDeletionFeedbackRepository],
 })

@@ -1,0 +1,1616 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-05-16T03:45:00.000Z",
+  "__export_source": "insomnia.desktop.app",
+  "resources": [
+    {
+      "_id": "wrk_mentores_api_completa",
+      "parentId": null,
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "name": "Mentores API - Completa",
+      "description": "Coleção para testar os principais fluxos da API de mentorias em ambiente remoto ou local. Use as variáveis do ambiente para trocar base_url, IDs, e-mails e códigos recebidos por e-mail/OAuth.",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_mentores_api_completa_base",
+      "parentId": "wrk_mentores_api_completa",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "name": "Base Environment",
+      "data": {
+        "base_url": "https://p01--mentores-backend-api-dev--bj8pjy8s82zl.code.run",
+        "local_base_url": "http://localhost:3000",
+        "mentor_email": "mentor.insomnia@soujunior.dev",
+        "user_email": "mentorado.insomnia@soujunior.dev",
+        "password": "Mentor@123",
+        "new_password": "Mentor@456",
+        "mentor_id": "f57cdf2b-570a-4091-906e-1e2094e75418",
+        "user_id": "",
+        "calendly_info_id": "",
+        "testimony_id": "",
+        "event_uuid": "",
+        "mentor_activation_code": "",
+        "user_activation_code": "",
+        "restore_code": "",
+        "calendly_name": "patrick-rocha-otero",
+        "agenda_name": "mentoria",
+        "oauth_code": "",
+        "oauth_state": "",
+        "start_time": "2026-05-16T03:00:00.000Z",
+        "end_time": "2026-05-31T02:59:59.999Z",
+        "selected_start_time": "2026-05-18T12:00:00.000Z",
+        "selected_scheduling_url": "",
+        "timezone": "America/Sao_Paulo",
+        "profile_file_path": "",
+        "feedback_reason_option": "Não tenho mais disponibilidade para mentorias",
+        "feedback_reason_text": "Teste de fluxo pelo Insomnia.",
+        "feedback_usability_rating": 5,
+        "feedback_satisfaction_rating": 5
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "base_url",
+          "local_base_url",
+          "mentor_email",
+          "user_email",
+          "password",
+          "new_password",
+          "mentor_id",
+          "user_id",
+          "calendly_info_id",
+          "testimony_id",
+          "event_uuid",
+          "mentor_activation_code",
+          "user_activation_code",
+          "restore_code",
+          "calendly_name",
+          "agenda_name",
+          "oauth_code",
+          "oauth_state",
+          "start_time",
+          "end_time",
+          "selected_start_time",
+          "selected_scheduling_url",
+          "timezone",
+          "profile_file_path",
+          "feedback_reason_option",
+          "feedback_reason_text",
+          "feedback_usability_rating",
+          "feedback_satisfaction_rating"
+        ]
+      },
+      "color": "#003986",
+      "isPrivate": false,
+      "metaSortKey": 1778903100000,
+      "_type": "environment"
+    },
+    {
+      "_id": "jar_mentores_api_completa",
+      "parentId": "wrk_mentores_api_completa",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "name": "Default Jar",
+      "cookies": [],
+      "_type": "cookie_jar"
+    },
+    {
+      "_id": "spc_mentores_api_completa",
+      "parentId": "wrk_mentores_api_completa",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "fileName": "Mentores API - Completa",
+      "contents": "",
+      "contentType": "yaml",
+      "_type": "api_spec"
+    },
+    {
+      "_id": "fld_auth",
+      "parentId": "wrk_mentores_api_completa",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "name": "01 - Auth",
+      "description": "Login e consulta do usuário autenticado. As requisições protegidas usam o token extraído automaticamente do login de mentor ou mentorado.",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 1000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_auth_login_mentor",
+      "parentId": "fld_auth",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/auth/login",
+      "name": "Login mentor",
+      "description": "Autentica um mentor. As demais requisições de mentor podem extrair o token deste response automaticamente.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.mentor_email }}\",\n  \"password\": \"{{ _.password }}\",\n  \"type\": \"mentor\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 1010,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_auth_login_user",
+      "parentId": "fld_auth",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/auth/login",
+      "name": "Login mentorado",
+      "description": "Autentica um mentorado. Use este login para testar agendamento como pessoa mentorada.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.user_email }}\",\n  \"password\": \"{{ _.password }}\",\n  \"type\": \"user\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 1020,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_auth_logged_mentor",
+      "parentId": "fld_auth",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/auth/user-logged",
+      "name": "Usuário logado - token de mentor",
+      "description": "Retorna os dados do token autenticado. Se o token não for capturado automaticamente, copie o token do login e cole manualmente no Bearer.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{% response 'body', 'req_auth_login_mentor', 'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+      },
+      "metaSortKey": 1030,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_auth_logged_user",
+      "parentId": "fld_auth",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/auth/user-logged",
+      "name": "Usuário logado - token de mentorado",
+      "description": "Retorna os dados do token autenticado como mentorado.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{% response 'body', 'req_auth_login_user', 'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+      },
+      "metaSortKey": 1040,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_mentors",
+      "parentId": "wrk_mentores_api_completa",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "name": "02 - Mentores",
+      "description": "Cadastro, listagem, busca, atualização, imagem, senha, ativação, restauração e exclusão lógica de mentor.",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 2000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_mentor_create",
+      "parentId": "fld_mentors",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/mentor",
+      "name": "Criar mentor",
+      "description": "Cria um mentor. Depois da criação, ative por e-mail/código ou ajuste pelo ambiente remoto conforme necessário.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"fullName\": \"Mentor Insomnia\",\n  \"dateOfBirth\": \"1995-05-16\",\n  \"email\": \"{{ _.mentor_email }}\",\n  \"password\": \"{{ _.password }}\",\n  \"specialties\": [\"Front-End\", \"Back-End\"],\n  \"registerComplete\": false\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 2010,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mentor_list_all",
+      "parentId": "fld_mentors",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/mentor",
+      "name": "Listar todos os mentores",
+      "description": "Endpoint público de listagem completa.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 2020,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mentor_list_registered",
+      "parentId": "fld_mentors",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/mentor/registered",
+      "name": "Listar mentores com cadastro completo",
+      "description": "Lista mentores disponíveis para descoberta na plataforma.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 2030,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mentor_get_by_id",
+      "parentId": "fld_mentors",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/mentor/{{ _.mentor_id }}",
+      "name": "Buscar mentor por ID",
+      "description": "Use mentor_id no ambiente para trocar o mentor consultado.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 2040,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mentor_search",
+      "parentId": "fld_mentors",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/mentor/search",
+      "name": "Buscar mentor por nome e especialidade",
+      "description": "Os parâmetros podem ser usados juntos ou separados, conforme regra do serviço.",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "name": "fullName",
+          "value": "Patrick",
+          "disabled": false
+        },
+        {
+          "name": "specialty",
+          "value": "Front-End",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 2050,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mentor_single_query",
+      "parentId": "fld_mentors",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/mentor/singlequery",
+      "name": "Buscar mentor por texto livre",
+      "description": "Busca por uma query única.",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "name": "query",
+          "value": "front",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 2060,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mentor_update",
+      "parentId": "fld_mentors",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/mentor",
+      "name": "Atualizar mentor logado",
+      "description": "Atualiza o mentor autenticado pelo token.",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"fullName\": \"Mentor Insomnia Atualizado\",\n  \"dateOfBirth\": \"1995-05-16\",\n  \"email\": \"{{ _.mentor_email }}\",\n  \"specialties\": [\"Front-End\", \"Back-End\", \"Dados\"],\n  \"role\": \"Desenvolvedor Full Stack\",\n  \"gender\": \"Homem Cis\",\n  \"aboutMe\": \"Texto de teste para validar o perfil do mentor pelo Insomnia.\",\n  \"registerComplete\": true\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{% response 'body', 'req_auth_login_mentor', 'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+      },
+      "metaSortKey": 2070,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mentor_complete_register",
+      "parentId": "fld_mentors",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/mentor/completeRegister",
+      "name": "Finalizar cadastro do mentor",
+      "description": "Marca o cadastro do mentor logado como completo.",
+      "method": "POST",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{% response 'body', 'req_auth_login_mentor', 'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+      },
+      "metaSortKey": 2080,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mentor_change_password",
+      "parentId": "fld_mentors",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/mentor/change_password",
+      "name": "Alterar senha do mentor",
+      "description": "Atenção: altera a senha real do mentor autenticado. Depois de usar, atualize password no ambiente ou reverta com a nova senha.",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"oldPassword\": \"{{ _.password }}\",\n  \"password\": \"{{ _.new_password }}\",\n  \"confirmPassword\": \"{{ _.new_password }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{% response 'body', 'req_auth_login_mentor', 'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+      },
+      "metaSortKey": 2090,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mentor_upload_profile",
+      "parentId": "fld_mentors",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/mentor/uploadProfileImage",
+      "name": "Enviar imagem de perfil do mentor",
+      "description": "Preencha profile_file_path no ambiente ou selecione o arquivo manualmente no campo file.",
+      "method": "POST",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "id": "pair_mentor_profile_file",
+            "name": "file",
+            "value": "",
+            "type": "file",
+            "fileName": "{{ _.profile_file_path }}"
+          }
+        ]
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "multipart/form-data"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{% response 'body', 'req_auth_login_mentor', 'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+      },
+      "metaSortKey": 2100,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mentor_activate",
+      "parentId": "fld_mentors",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/mentor/active",
+      "name": "Ativar mentor por código",
+      "description": "Use o código recebido por e-mail em mentor_activation_code.",
+      "method": "PATCH",
+      "body": {},
+      "parameters": [
+        {
+          "name": "code",
+          "value": "{{ _.mentor_activation_code }}",
+          "disabled": false
+        },
+        {
+          "name": "email",
+          "value": "{{ _.mentor_email }}",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 2110,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mentor_restore_request",
+      "parentId": "fld_mentors",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/mentor/restoreAccount/{{ _.mentor_email }}",
+      "name": "Solicitar restauração de conta de mentor",
+      "description": "Dispara o fluxo de restauração da conta do mentor pelo e-mail.",
+      "method": "POST",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 2120,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mentor_restore_redefine",
+      "parentId": "fld_mentors",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/mentor/restoreAccount/redefinePass",
+      "name": "Redefinir senha de mentor por código",
+      "description": "Use restore_code recebido por e-mail.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"password\": \"{{ _.new_password }}\",\n  \"confirmPassword\": \"{{ _.new_password }}\"\n}"
+      },
+      "parameters": [
+        {
+          "name": "code",
+          "value": "{{ _.restore_code }}",
+          "disabled": false
+        },
+        {
+          "name": "email",
+          "value": "{{ _.mentor_email }}",
+          "disabled": false
+        }
+      ],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 2130,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mentor_delete_logged",
+      "parentId": "fld_mentors",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/mentor/delete-mentor",
+      "name": "Excluir conta do mentor logado",
+      "description": "Atenção: executa a exclusão lógica/fluxo de exclusão da conta do mentor autenticado.",
+      "method": "PATCH",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{% response 'body', 'req_auth_login_mentor', 'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+      },
+      "metaSortKey": 2140,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_users",
+      "parentId": "wrk_mentores_api_completa",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "name": "03 - Mentorados",
+      "description": "Cadastro, consulta, atualização, imagem, ativação, restauração e desativação de mentorado.",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 3000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_user_create",
+      "parentId": "fld_users",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/user",
+      "name": "Criar mentorado",
+      "description": "Cria um mentorado para testar fluxos de login e agendamento.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"fullName\": \"Mentorado Insomnia\",\n  \"dateOfBirth\": \"2000-05-16\",\n  \"email\": \"{{ _.user_email }}\",\n  \"emailConfirm\": \"{{ _.user_email }}\",\n  \"password\": \"{{ _.password }}\",\n  \"passwordConfirmation\": \"{{ _.password }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 3010,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_user_list_all",
+      "parentId": "fld_users",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/user",
+      "name": "Listar mentorados",
+      "description": "Endpoint interno/exposto para consulta geral de mentorados.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 3020,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_user_get_by_id",
+      "parentId": "fld_users",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/user/{{ _.user_id }}",
+      "name": "Buscar mentorado por ID",
+      "description": "Preencha user_id no ambiente.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 3030,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_user_update",
+      "parentId": "fld_users",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/user/{{ _.user_id }}",
+      "name": "Atualizar mentorado logado",
+      "description": "O controller usa o ID do token autenticado. O :id permanece na rota por contrato.",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"fullName\": \"Mentorado Insomnia Atualizado\",\n  \"dateOfBirth\": \"2000-05-16\",\n  \"email\": \"{{ _.user_email }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{% response 'body', 'req_auth_login_user', 'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+      },
+      "metaSortKey": 3040,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_user_upload_profile",
+      "parentId": "fld_users",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/user/uploadProfileImage",
+      "name": "Enviar imagem de perfil do mentorado",
+      "description": "Preencha profile_file_path no ambiente ou selecione o arquivo manualmente no campo file.",
+      "method": "POST",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "id": "pair_user_profile_file",
+            "name": "file",
+            "value": "",
+            "type": "file",
+            "fileName": "{{ _.profile_file_path }}"
+          }
+        ]
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "multipart/form-data"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{% response 'body', 'req_auth_login_user', 'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+      },
+      "metaSortKey": 3050,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_user_activate",
+      "parentId": "fld_users",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/user/active",
+      "name": "Ativar mentorado por código",
+      "description": "Use o código recebido por e-mail em user_activation_code.",
+      "method": "PATCH",
+      "body": {},
+      "parameters": [
+        {
+          "name": "code",
+          "value": "{{ _.user_activation_code }}",
+          "disabled": false
+        },
+        {
+          "name": "email",
+          "value": "{{ _.user_email }}",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 3060,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_user_deactivate",
+      "parentId": "fld_users",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/user/{{ _.user_id }}",
+      "name": "Desativar mentorado por ID",
+      "description": "Atenção: desativa a conta informada em user_id.",
+      "method": "PATCH",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 3070,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_user_restore_request",
+      "parentId": "fld_users",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/user/restoreAccount/{{ _.user_email }}",
+      "name": "Solicitar restauração de conta de mentorado",
+      "description": "Dispara o fluxo de restauração da conta do mentorado pelo e-mail.",
+      "method": "POST",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 3080,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_user_restore_redefine",
+      "parentId": "fld_users",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/user/restoreAccount/redefinePass",
+      "name": "Redefinir senha de mentorado por código",
+      "description": "Use restore_code recebido por e-mail.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"password\": \"{{ _.new_password }}\",\n  \"confirmPassword\": \"{{ _.new_password }}\"\n}"
+      },
+      "parameters": [
+        {
+          "name": "code",
+          "value": "{{ _.restore_code }}",
+          "disabled": false
+        },
+        {
+          "name": "email",
+          "value": "{{ _.user_email }}",
+          "disabled": false
+        }
+      ],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 3090,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_calendly",
+      "parentId": "wrk_mentores_api_completa",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "name": "04 - Calendly e OAuth",
+      "description": "Configuração do link, OAuth, conexão, horários, agendamentos e cancelamentos via Calendly.",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 4000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_calendly_list_infos",
+      "parentId": "fld_calendly",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/calendly",
+      "name": "Listar configurações públicas do Calendly",
+      "description": "Lista mentorId, calendlyName, agendaName e isConnected sem expor tokens.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 4010,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_calendly_mentor_info",
+      "parentId": "fld_calendly",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/calendly/mentorInfo",
+      "name": "Configuração Calendly do mentor logado",
+      "description": "Retorna a configuração segura do Calendly do mentor autenticado.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{% response 'body', 'req_auth_login_mentor', 'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+      },
+      "metaSortKey": 4020,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_calendly_create_info",
+      "parentId": "fld_calendly",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/calendly",
+      "name": "Criar configuração Calendly do mentor",
+      "description": "Cria a configuração básica do link público. O OAuth real deve ser feito pelo endpoint de conexão.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"calendlyName\": \"{{ _.calendly_name }}\",\n  \"agendaName\": \"{{ _.agenda_name }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{% response 'body', 'req_auth_login_mentor', 'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+      },
+      "metaSortKey": 4030,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_calendly_update_info",
+      "parentId": "fld_calendly",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/calendly/{{ _.calendly_info_id }}",
+      "name": "Atualizar configuração Calendly do mentor",
+      "description": "Atualiza calendlyName e agendaName do mentor autenticado. O ID está na rota por contrato, mas o serviço atualiza pelo mentor logado.",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"calendlyName\": \"{{ _.calendly_name }}\",\n  \"agendaName\": \"{{ _.agenda_name }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{% response 'body', 'req_auth_login_mentor', 'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+      },
+      "metaSortKey": 4040,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_calendly_connect",
+      "parentId": "fld_calendly",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/calendly/connect",
+      "name": "Iniciar OAuth Calendly",
+      "description": "Abre/redireciona para autorização do Calendly. No Insomnia, use Follow Redirects ou copie a URL gerada para o navegador se quiser concluir login visualmente.",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "name": "mentorId",
+          "value": "{{ _.mentor_id }}",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 4050,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_calendly_callback",
+      "parentId": "fld_calendly",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/calendly/callback",
+      "name": "Callback OAuth Calendly",
+      "description": "Normalmente o Calendly chama este endpoint automaticamente. Use manualmente apenas se capturar code/state no navegador.",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "name": "code",
+          "value": "{{ _.oauth_code }}",
+          "disabled": false
+        },
+        {
+          "name": "state",
+          "value": "{{ _.oauth_state }}",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 4060,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_calendly_disconnect_manual",
+      "parentId": "fld_calendly",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/calendly/{{ _.calendly_info_id }}",
+      "name": "Desvincular OAuth Calendly manualmente",
+      "description": "Não existe endpoint DELETE específico para OAuth. Esta requisição limpa os campos de token do mentor logado via update, preservando calendlyName e agendaName.",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"calendlyUserUuid\": null,\n  \"calendlyAccessToken\": null,\n  \"calendlyRefreshToken\": null,\n  \"accessTokenExpiration\": null,\n  \"calendlyName\": \"{{ _.calendly_name }}\",\n  \"agendaName\": \"{{ _.agenda_name }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{% response 'body', 'req_auth_login_mentor', 'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+      },
+      "metaSortKey": 4070,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_calendly_schedules",
+      "parentId": "fld_calendly",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/calendly/schedules",
+      "name": "Listar agendamentos futuros do mentor logado",
+      "description": "Lista eventos futuros do mentor autenticado no Calendly.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{% response 'body', 'req_auth_login_mentor', 'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+      },
+      "metaSortKey": 4080,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_calendly_available_times",
+      "parentId": "fld_calendly",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/calendly/mentor/{{ _.mentor_id }}/available-times",
+      "name": "Buscar horários disponíveis do mentor",
+      "description": "Exige que o mentor tenha OAuth Calendly conectado. Se retornar 404 com mentor existente, normalmente significa Calendly desconectado.",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "name": "startTime",
+          "value": "{{ _.start_time }}",
+          "disabled": false
+        },
+        {
+          "name": "endTime",
+          "value": "{{ _.end_time }}",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 4090,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_calendly_create_invitee",
+      "parentId": "fld_calendly",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/calendly/mentor/{{ _.mentor_id }}/invitees",
+      "name": "Agendar mentoria pelo fluxo gratuito",
+      "description": "Retorna URL do Calendly já preenchida para o mentorado concluir a confirmação. Use token de mentorado.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"startTime\": \"{{ _.selected_start_time }}\",\n  \"schedulingUrl\": \"{{ _.selected_scheduling_url }}\",\n  \"timezone\": \"{{ _.timezone }}\",\n  \"description\": \"Quero revisar arquitetura, componentes e próximos passos do projeto.\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{% response 'body', 'req_auth_login_user', 'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+      },
+      "metaSortKey": 4100,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_calendly_cancel_schedule",
+      "parentId": "fld_calendly",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/calendly/schedules/{{ _.event_uuid }}/cancellation",
+      "name": "Cancelar agendamento",
+      "description": "Cancela um evento futuro do mentor logado. Eventos no passado retornam erro do Calendly.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"reason\": \"Cancelamento de teste pelo Insomnia.\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{% response 'body', 'req_auth_login_mentor', 'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+      },
+      "metaSortKey": 4110,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_testimony",
+      "parentId": "wrk_mentores_api_completa",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "name": "05 - Depoimentos",
+      "description": "Listagem, criação, edição e exclusão de depoimentos.",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 5000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_testimony_list",
+      "parentId": "fld_testimony",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/testimony",
+      "name": "Listar depoimentos",
+      "description": "Lista depoimentos exibidos no portal.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 5010,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_testimony_create",
+      "parentId": "fld_testimony",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/testimony",
+      "name": "Criar depoimento",
+      "description": "Cria depoimento usando dados do mentor autenticado.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"description\": \"Ser mentor no Portal de Mentorias tem sido uma experiência muito positiva. Este é um depoimento de teste enviado pelo Insomnia.\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{% response 'body', 'req_auth_login_mentor', 'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+      },
+      "metaSortKey": 5020,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_testimony_update",
+      "parentId": "fld_testimony",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/testimony/{{ _.testimony_id }}",
+      "name": "Atualizar depoimento",
+      "description": "Atualiza um depoimento pelo ID.",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"userName\": \"Mentor Insomnia\",\n  \"role\": \"Desenvolvedor Full Stack\",\n  \"description\": \"Depoimento atualizado pelo Insomnia.\",\n  \"imageUrl\": \"\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 5030,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_testimony_delete",
+      "parentId": "fld_testimony",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/testimony/{{ _.testimony_id }}",
+      "name": "Excluir depoimento",
+      "description": "Remove um depoimento pelo ID.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 5040,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_feedback_upload_health",
+      "parentId": "wrk_mentores_api_completa",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "name": "06 - Feedback, Upload e Diagnóstico",
+      "description": "Feedback de exclusão, upload genérico e endpoints de diagnóstico.",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 6000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_account_deletion_feedback",
+      "parentId": "fld_feedback_upload_health",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/account-deletion-feedback",
+      "name": "Enviar feedback de exclusão de conta",
+      "description": "Cria feedback associado ao mentor autenticado antes/depois do fluxo de exclusão.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"reasonOption\": \"{{ _.feedback_reason_option }}\",\n  \"reasonText\": \"{{ _.feedback_reason_text }}\",\n  \"usabilityRating\": {{ _.feedback_usability_rating }},\n  \"satisfactionRating\": {{ _.feedback_satisfaction_rating }},\n  \"userExperienceFeedback\": \"Fluxo testado pelo Insomnia.\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{% response 'body', 'req_auth_login_mentor', 'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+      },
+      "metaSortKey": 6010,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_upload_generic",
+      "parentId": "fld_feedback_upload_health",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/upload",
+      "name": "Upload genérico",
+      "description": "Upload autenticado de arquivo. Preencha profile_file_path no ambiente ou selecione o arquivo manualmente.",
+      "method": "POST",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "id": "pair_generic_upload_file",
+            "name": "file",
+            "value": "",
+            "type": "file",
+            "fileName": "{{ _.profile_file_path }}"
+          }
+        ]
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "multipart/form-data"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{% response 'body', 'req_auth_login_mentor', 'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+      },
+      "metaSortKey": 6020,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_northflank_test",
+      "parentId": "fld_feedback_upload_health",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/user/northflank/test",
+      "name": "Diagnóstico Northflank",
+      "description": "Endpoint existente para teste de integração/ambiente Northflank.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 6030,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_swagger_json",
+      "parentId": "fld_feedback_upload_health",
+      "modified": 1778903100000,
+      "created": 1778903100000,
+      "url": "{{ _.base_url }}/api-json",
+      "name": "Swagger JSON",
+      "description": "Consulta o contrato Swagger publicado pelo backend remoto.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": 6040,
+      "isPrivate": false,
+      "pathParameters": [],
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    }
+  ]
+}

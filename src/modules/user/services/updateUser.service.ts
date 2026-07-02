@@ -9,10 +9,18 @@ export class UpdateUserService {
   constructor(private userRepository: UserRepository) {}
 
   async execute(id: string, data: UpdateUserDto) {
-    const UserExists = await this.userRepository.findUserById(id);
+    const userExists = await this.userRepository.findUserById(id);
 
-    if (!UserExists) {
+    if (!userExists) {
       throw new CustomNotFoundException('There are no User with that id');
+    }
+
+    if (
+      data.registerComplete === undefined &&
+      data.specialties?.length &&
+      data.aboutMe !== undefined
+    ) {
+      data.registerComplete = true;
     }
 
     try {

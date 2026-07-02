@@ -4,6 +4,7 @@ import { handleError } from '../../shared/utils/handle-error.util';
 import { EmailTemplateType } from './types/email-template.type';
 import { MentorEntity } from '../mentors/entities/mentor.entity';
 import { UserEntity } from '../user/entities/user.entity';
+import { LoginTypeEnum } from '../auth/enums/login-type.enum';
 
 @Injectable()
 export class MailService {
@@ -11,7 +12,7 @@ export class MailService {
 
   async mentorSendEmailConfirmation(mentor: MentorEntity): Promise<void> {
     const { email, fullName, code } = mentor;
-    const url = `${process.env.EMAIL_CONFIRMATION_URL}?code=${code}&email=${email}`;
+    const url = `${process.env.EMAIL_CONFIRMATION_URL}?code=${code}&email=${email}&type=${LoginTypeEnum.MENTOR}`;
 
     await this.mailerService
       .sendMail({
@@ -32,7 +33,7 @@ export class MailService {
     const { email, fullName, code } = mentor;
     const { EMAIL_CONFIRMATION_URL } = process.env;
 
-    const url = `${EMAIL_CONFIRMATION_URL}?code=${code}&email=${email}`;
+    const url = `${EMAIL_CONFIRMATION_URL}?code=${code}&email=${email}&type=${LoginTypeEnum.MENTOR}`;
 
     try {
       await this.mailerService
@@ -78,23 +79,18 @@ export class MailService {
     return;
   }
 
-  async mentorSendFirstDeactivationNotice(mentor: MentorEntity): Promise<void> {
+  async mentorSendDeletionConfirmation(mentor: MentorEntity): Promise<void> {
     const { email, fullName } = mentor;
-
-    const loginUrl = process.env.LOGIN_URL;
 
     try {
       await this.mailerService
         .sendMail({
           to: email,
-          subject: 'Conta em processo de exclusão - SouJunior',
-          template: './firstDeactivationNotification',
+          subject: 'Exclusão de perfil confirmada - SouJunior',
+          template: './profileDeletionConfirmation',
           context: {
             name: fullName,
-            loginUrl,
-            deletionDate: new Date(
-              Date.now() + 1 * 60 * 1000,
-            ).toLocaleDateString('pt-BR'),
+            profileLabel: 'perfil de mentor(a)',
           },
         })
         .catch(handleError);
@@ -105,37 +101,46 @@ export class MailService {
     return;
   }
 
-  async mentorSendSecondDeactivationNotice(mentor: MentorEntity) {
+  async mentorSendPauseConfirmation(mentor: MentorEntity): Promise<void> {
     const { email, fullName } = mentor;
 
     try {
       await this.mailerService
         .sendMail({
           to: email,
-          subject: 'Lembrete de desativação de conta - SouJunior',
-          template: './secondDeactivationNotification',
+          subject: 'Perfil de mentor(a) pausado - SouJunior',
+          template: './mentorProfileStatusNotification',
           context: {
+            title: 'Perfil pausado com sucesso',
             name: fullName,
+            description:
+              'Seu perfil de mentor(a) foi pausado e deixou de aparecer nos resultados de busca da plataforma.',
           },
         })
         .catch(handleError);
     } catch (error) {
       console.log(error.message);
     }
+
     return;
   }
 
-  async mentorSendThirdDeactivationNotice(mentor: MentorEntity) {
+  async mentorSendReactivationConfirmation(
+    mentor: MentorEntity,
+  ): Promise<void> {
     const { email, fullName } = mentor;
 
     try {
       await this.mailerService
         .sendMail({
           to: email,
-          subject: 'Sua conta será permanentemente desativada - SouJunior',
-          template: './thirdDeactivationNotification',
+          subject: 'Perfil de mentor(a) reativado - SouJunior',
+          template: './mentorProfileStatusNotification',
           context: {
+            title: 'Perfil reativado com sucesso',
             name: fullName,
+            description:
+              'Seu perfil de mentor(a) foi reativado e voltou a aparecer nos resultados de busca da plataforma.',
           },
         })
         .catch(handleError);
@@ -148,7 +153,7 @@ export class MailService {
 
   async userSendEmailConfirmation(user: UserEntity): Promise<void> {
     const { email, fullName, code } = user;
-    const url = `${process.env.EMAIL_CONFIRMATION_URL}?code=${code}&email=${email}`;
+    const url = `${process.env.EMAIL_CONFIRMATION_URL}?code=${code}&email=${email}&type=${LoginTypeEnum.USER}`;
 
     await this.mailerService
       .sendMail({
@@ -169,7 +174,7 @@ export class MailService {
     const { email, fullName, code } = user;
     const { EMAIL_CONFIRMATION_URL } = process.env;
 
-    const url = `${EMAIL_CONFIRMATION_URL}?code=${code}&email=${email}`;
+    const url = `${EMAIL_CONFIRMATION_URL}?code=${code}&email=${email}&type=${LoginTypeEnum.USER}`;
 
     try {
       await this.mailerService
@@ -205,6 +210,85 @@ export class MailService {
           template: './restoreEmail',
           context: {
             url,
+          },
+        })
+        .catch(handleError);
+    } catch (error) {
+      console.log(error.message);
+    }
+
+    return;
+  }
+
+  async userSendDeletionConfirmation(user: UserEntity): Promise<void> {
+    const { email, fullName } = user;
+
+    try {
+      await this.mailerService
+        .sendMail({
+          to: email,
+          subject: 'Exclusão de perfil confirmada - SouJunior',
+          template: './profileDeletionConfirmation',
+          context: {
+            name: fullName,
+            profileLabel: 'perfil de mentorado(a)',
+          },
+        })
+        .catch(handleError);
+    } catch (error) {
+      console.log(error.message);
+    }
+
+    return;
+  }
+
+  async sendAccountDeletionConfirmation(
+    email: string,
+    profileLabel: string,
+  ): Promise<void> {
+    try {
+      await this.mailerService
+        .sendMail({
+          to: email,
+          subject: 'Exclusão confirmada - SouJunior',
+          template: './profileDeletionConfirmation',
+          context: {
+            name: 'usuário(a)',
+            profileLabel,
+          },
+        })
+        .catch(handleError);
+    } catch (error) {
+      console.log(error.message);
+    }
+
+    return;
+  }
+
+  async userSendMentorshipFeedbackRequest({
+    email,
+    fullName,
+    mentorName,
+    sessionDate,
+    feedbackUrl,
+  }: {
+    email: string;
+    fullName: string;
+    mentorName: string;
+    sessionDate: Date | string;
+    feedbackUrl: string;
+  }) {
+    try {
+      await this.mailerService
+        .sendMail({
+          to: email,
+          subject: 'Como foi sua mentoria? Queremos ouvir você',
+          template: './mentorshipFeedbackRequest',
+          context: {
+            name: fullName,
+            mentorName,
+            feedbackUrl,
+            sessionDate: new Date(sessionDate).toLocaleString('pt-BR'),
           },
         })
         .catch(handleError);

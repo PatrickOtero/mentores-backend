@@ -1,6 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { LoginTypeEnum } from '../enums/login-type.enum';
+import {
+  IsEmail,
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class InfoLoginDto {
   @IsEmail(undefined, { message: 'Invalid e-mail format' })
@@ -22,9 +27,15 @@ export class InfoLoginDto {
   })
   password: string;
 
-  @IsEnum(LoginTypeEnum, {
-    message: 'This field only accepts: "mentor" or "user"',
+  @IsOptional()
+  @IsIn(['mentor', 'user', 'mentee'], {
+    message: 'This field only accepts: "mentor", "user" or "mentee"',
   })
-  @IsNotEmpty()
-  type: LoginTypeEnum;
+  @IsString({ message: 'Only strings are allowed in this field' })
+  @ApiProperty({
+    required: false,
+    description: 'Perfil desejado no login.',
+    example: 'mentor',
+  })
+  type?: string;
 }

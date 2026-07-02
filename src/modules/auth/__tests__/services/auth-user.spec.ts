@@ -1,13 +1,14 @@
-import { MentorRepository } from 'src/modules/mentors/repository/mentor.repository';
-import { AuthService } from '../../services/auth.service';
-import { UserRepository } from 'src/modules/user/user.repository';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { JwtService } from '@nestjs/jwt';
 import { MailService } from 'src/modules/mails/mail.service';
+import { MentorRepository } from 'src/modules/mentors/repository/mentor.repository';
+import { UserRepository } from 'src/modules/user/user.repository';
+import { CalendlyRepository } from 'src/modules/calendly/repository/calendly.repository';
+import IHashAdapter from 'src/lib/adapter/hash/hashAdapterInterface';
+import { AuthService } from '../../services/auth.service';
 import { InfoLoginDto } from '../../dtos/info-login.dto';
 import { LoginTypeEnum } from '../../enums/login-type.enum';
 import { InfoEntity } from '../../entity/info.entity';
-import * as bcrypt from 'bcrypt';
-import { CalendlyRepository } from 'src/modules/calendly/repository/calendly.repository';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -16,30 +17,35 @@ describe('AuthService', () => {
   let jwtService: JwtService;
   let mailService: MailService;
   let calendlyRepository: CalendlyRepository;
-
+  let hashAdapter: IHashAdapter;
 
   beforeEach(() => {
     mentorRepository = {
-      findMentorByEmail: jest.fn(),
-      updateMentor: jest.fn(),
+      findMentorByEmail: vi.fn(),
+      updateMentor: vi.fn(),
     } as any;
 
     userRepository = {
-      findUserByEmail: jest.fn(),
-      updateUser: jest.fn(),
+      findUserByEmail: vi.fn(),
+      updateUser: vi.fn(),
     } as any;
 
     jwtService = {
-      sign: jest.fn(),
+      sign: vi.fn(),
     } as any;
 
     mailService = {
-      mentorSendCreationConfirmation: jest.fn(),
-      userSendCreationConfirmation: jest.fn(),
+      mentorSendCreationConfirmation: vi.fn(),
+      userSendCreationConfirmation: vi.fn(),
     } as any;
 
     calendlyRepository = {
-      getCalendlyInfoByMentorId: jest.fn().mockResolvedValue(null),
+      getCalendlyInfoByMentorId: vi.fn(),
+    } as any;
+
+    hashAdapter = {
+      compareHash: vi.fn(),
+      createHash: vi.fn(),
     } as any;
 
     authService = new AuthService(
@@ -48,50 +54,114 @@ describe('AuthService', () => {
       userRepository,
       jwtService,
       mailService,
+      hashAdapter,
     );
   });
 
   describe('execute', () => {
-    it('should authenticate and return a token with user info', async () => {
-      jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
-      jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashedpassword' as never);
-
+    it('should authenticate a mentor and return a typed token', async () => {
       const loginData: InfoLoginDto = {
         email: 'mentor@example.com',
-        password: 'password123',
-        type: LoginTypeEnum.USER,
+        password: 'Password@123',
+        type: LoginTypeEnum.MENTOR,
       };
 
       const mockInfo: InfoEntity = {
         id: '1',
         email: loginData.email,
-        password: await bcrypt.hash(loginData.password, 10),
+        password: 'hashed-password',
         emailConfirmed: true,
         deleted: false,
         fullName: 'Test Mentor',
         dateOfBirth: '1990-01-01',
         specialties: ['Node.js'],
-        accessAttempt: 0,
+        accessAttempt: 2,
       };
 
-      mentorRepository.findMentorByEmail = jest
-        .fn()
-        .mockResolvedValue(mockInfo);
-        jwtService.sign = jest.fn().mockReturnValue('mocked-token');
+      vi.mocked(mentorRepository.findMentorByEmail).mockResolvedValue(
+        mockInfo as any,
+      );
+      vi.mocked(hashAdapter.compareHash).mockResolvedValue(true);
+      vi.mocked(jwtService.sign).mockReturnValue('mocked-token' as never);
+      vi.mocked(calendlyRepository.getCalendlyInfoByMentorId).mockResolvedValue(
+        { calendlyName: 'mentor-calendly' } as any,
+      );
 
       const result = await authService.execute(loginData);
 
+      expect(mentorRepository.updateMentor).toHaveBeenCalledWith(
+        mockInfo.id,
+        expect.objectContaining({
+          accessAttempt: 0,
+        }),
+      );
+      expect(jwtService.sign).toHaveBeenCalledWith({
+        email: loginData.email,
+        type: LoginTypeEnum.MENTOR,
+      });
       expect(result).toEqual({
         status: 200,
         data: {
           token: 'mocked-token',
+          profileType: LoginTypeEnum.MENTOR,
           info: {
             id: mockInfo.id,
             email: mockInfo.email,
             fullName: mockInfo.fullName,
-            dateOfBirth: '1990-01-01',
+            dateOfBirth: mockInfo.dateOfBirth,
             specialties: mockInfo.specialties,
-            calendlyName: "",
+            calendlyName: 'mentor-calendly',
+          },
+        },
+      });
+    });
+
+    it('should authenticate with the user profile when no type is provided and only the mentee profile is active', async () => {
+      const loginData: InfoLoginDto = {
+        email: 'user@example.com',
+        password: 'Password@123',
+      };
+
+      const mockUserInfo: InfoEntity = {
+        id: '2',
+        email: loginData.email,
+        password: 'hashed-password',
+        emailConfirmed: true,
+        deleted: false,
+        fullName: 'Test User',
+        dateOfBirth: '1998-02-12',
+        specialties: ['QA'],
+        accessAttempt: 0,
+        defaultProfile: LoginTypeEnum.USER,
+      };
+
+      vi.mocked(mentorRepository.findMentorByEmail).mockResolvedValue(
+        null as any,
+      );
+      vi.mocked(userRepository.findUserByEmail).mockResolvedValue(
+        mockUserInfo as any,
+      );
+      vi.mocked(hashAdapter.compareHash).mockResolvedValue(true);
+      vi.mocked(jwtService.sign).mockReturnValue('user-token' as never);
+
+      const result = await authService.execute(loginData);
+
+      expect(jwtService.sign).toHaveBeenCalledWith({
+        email: loginData.email,
+        type: LoginTypeEnum.USER,
+      });
+      expect(result).toEqual({
+        status: 200,
+        data: {
+          token: 'user-token',
+          profileType: LoginTypeEnum.USER,
+          info: {
+            id: mockUserInfo.id,
+            email: mockUserInfo.email,
+            fullName: mockUserInfo.fullName,
+            dateOfBirth: mockUserInfo.dateOfBirth,
+            specialties: mockUserInfo.specialties,
+            calendlyName: '',
           },
         },
       });

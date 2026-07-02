@@ -6,12 +6,8 @@ import { MentorEntity } from '../entities/mentor.entity';
 export class GetMentorBySingleQueryService {
   constructor(private mentorRepository: MentorRepository) {}
 
-  async execute(
-    query?: string,
-  ): Promise<MentorEntity[]> {
-    const users = await this.mentorRepository.findMentorsBySingleQuery(
-      query,
-    );
+  async execute(query?: string): Promise<MentorEntity[]> {
+    const users = await this.mentorRepository.findMentorsBySingleQuery(query);
 
     return users;
   }

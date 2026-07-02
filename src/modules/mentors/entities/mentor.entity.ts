@@ -12,11 +12,13 @@ export class MentorEntity {
   registerComplete?: boolean;
   profileKey?: string;
   profile?: string;
+  defaultProfile?: string;
   accessAttempt?: number;
   code?: string;
   createdAt?: string | Date;
   updatedAt?: string | Date;
   deleted?: boolean;
+  isProfilePaused?: boolean;
   deactivatedDays?: number;
   deactivatedAt?: Date | null | string; // Estou na dúvida se realmente precisa do string aqui, preciso tirar essa dúvida
 }

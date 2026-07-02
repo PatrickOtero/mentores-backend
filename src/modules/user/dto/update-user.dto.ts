@@ -1,7 +1,13 @@
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
+  IsBoolean,
   IsDate,
   IsEmail,
+  IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   Matches,
@@ -11,8 +17,11 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { Match } from '../../../modules/mentors/decorators/match.decorator';
+import { Gender } from '../../../modules/mentors/enums/gender.enum';
+import { Specialties } from '../../../modules/mentors/enums/specialties.enum';
 
 export class UpdateUserDto {
+  @IsOptional()
   @IsString()
   @IsNotEmpty({ message: "the 'fullName' field must not be empty" })
   @MaxLength(100, { message: 'Maximum of 100 characters exceeded' })
@@ -20,8 +29,9 @@ export class UpdateUserDto {
     required: true,
     example: 'Fulano de tal',
   })
-  fullName: string;
+  fullName?: string;
 
+  @IsOptional()
   @IsNotEmpty({ message: 'The dateOfBirth field must not be empty' })
   @Transform(({ value }) => new Date(value))
   @IsDate()
@@ -32,8 +42,9 @@ export class UpdateUserDto {
     required: true,
     example: '2023-04-06',
   })
-  dateOfBirth: Date | string;
+  dateOfBirth?: Date | string;
 
+  @IsOptional()
   @IsString({ message: 'Only strings are allowed in this field' })
   @IsEmail(undefined, {
     message: 'Invalid e-mail format',
@@ -45,7 +56,38 @@ export class UpdateUserDto {
     required: true,
     example: 'fulano.de.tal@dominio.com',
   })
-  email: string;
+  email?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsEnum(Specialties, { each: true })
+  @IsString({ each: true })
+  @ArrayMinSize(1)
+  @ArrayMaxSize(6)
+  @ApiProperty({
+    required: false,
+    type: 'String array',
+    example: 'Front-End, Back-End, QA, Dev Ops',
+  })
+  specialties?: string[];
+
+  @IsOptional()
+  @IsEnum(Gender)
+  @IsString()
+  @ApiProperty({
+    required: false,
+    example: 'Não binário',
+  })
+  gender?: string;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(600, { message: 'Maximum text length exceeded' })
+  aboutMe?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  copiedAboutMeFromMentor?: boolean;
 
   @IsNotEmpty({ message: "the 'password' field must not be empty" })
   @IsString({ message: 'Only strings are allowed in this field' })
@@ -75,6 +117,11 @@ export class UpdateUserDto {
   @IsOptional()
   passwordConfirmation?: string;
 
+  @IsBoolean()
+  @IsOptional()
+  @IsNotEmpty()
+  registerComplete?: boolean;
+
   @IsOptional()
   @IsString()
   @ApiProperty({
@@ -83,11 +130,37 @@ export class UpdateUserDto {
   profile?: string;
 
   @IsOptional()
+  @IsBoolean()
+  copiedProfileFromMentor?: boolean;
+
+  @IsOptional()
   @IsString()
   @ApiProperty({
     description: 'Chave para remoção da imagem do perfil',
   })
   profileKey?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @ApiProperty({
+    description: "Days of user's account deactivation.",
+  })
+  deactivatedDays?: number;
+
+  @IsOptional()
+  deactivatedAt?: Date | null;
+
+  @IsOptional()
+  @IsBoolean()
+  deleted?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  emailConfirmed?: boolean;
+
+  @IsOptional()
+  @IsString()
+  defaultProfile?: string;
 
   @IsOptional()
   file?: any;

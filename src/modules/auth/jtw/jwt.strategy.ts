@@ -4,6 +4,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { MentorRepository } from '../../../modules/mentors/repository/mentor.repository';
 import { UserRepository } from '../../../modules/user/user.repository';
 import { handleError } from '../../../shared/utils/handle-error.util';
+import { LoginTypeEnum } from '../enums/login-type.enum';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -18,7 +19,33 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { email: string }) {
+  async validate(payload: { email: string; type?: LoginTypeEnum }) {
+    if (payload.type === LoginTypeEnum.MENTOR) {
+      const mentor = await this.mentorRepository
+        .findMentorByEmail(payload.email)
+        .catch(handleError);
+
+      if (!mentor || mentor.deleted) {
+        throw new UnauthorizedException('User not found or not authorized!');
+      }
+
+      delete mentor.password;
+      return mentor;
+    }
+
+    if (payload.type === LoginTypeEnum.USER) {
+      const user = await this.userRepository
+        .findUserByEmail(payload.email)
+        .catch(handleError);
+
+      if (!user || user.deleted) {
+        throw new UnauthorizedException('User not found or not authorized!');
+      }
+
+      delete user.password;
+      return user;
+    }
+
     const mentor = await this.mentorRepository
       .findMentorByEmail(payload.email)
       .catch(handleError);
@@ -27,18 +54,19 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       .findUserByEmail(payload.email)
       .catch(handleError);
 
-    if (!mentor && !user) {
+    const activeMentor = mentor && !mentor.deleted ? mentor : null;
+    const activeUser = user && !user.deleted ? user : null;
+
+    if (!activeMentor && !activeUser) {
       throw new UnauthorizedException('User not found or not authorized!');
     }
 
-    if (mentor) {
-      delete mentor.password;
-      return mentor;
+    if (activeMentor) {
+      delete activeMentor.password;
+      return activeMentor;
     }
 
-    if (user) {
-      delete user.password;
-      return user;
-    }
+    delete activeUser.password;
+    return activeUser;
   }
 }

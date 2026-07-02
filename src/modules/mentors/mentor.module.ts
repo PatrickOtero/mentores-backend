@@ -21,6 +21,10 @@ import { JwtService } from '@nestjs/jwt';
 import { ListAllRegisteredMentorsService } from './services/listAllRegisteredMentors.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { GetMentorBySingleQueryService } from './services/getMentorBySingleQuery.service';
+import { CreateMentorProfileService } from './services/createMentorProfile.service';
+import { UserRepository } from '../user/user.repository';
+import { PauseMentorProfileService } from './services/pauseMentorProfile.service';
+import { ReactivateMentorProfileService } from './services/reactivateMentorProfile.service';
 
 @Module({
   imports: [
@@ -37,6 +41,9 @@ import { GetMentorBySingleQueryService } from './services/getMentorBySingleQuery
     GetMentorByIdService,
     GetMentorByNameAndRoleService,
     GetMentorBySingleQueryService,
+    CreateMentorProfileService,
+    PauseMentorProfileService,
+    ReactivateMentorProfileService,
     ActivateMentorService,
     ChangeMentorPasswordService,
     DeleteMentorService,
@@ -48,7 +55,13 @@ import { GetMentorBySingleQueryService } from './services/getMentorBySingleQuery
     GenerateCodeUtil,
     FileUploadService,
     JwtService,
+    UserRepository,
   ],
-  exports: [MentorRepository],
+  exports: [
+    MentorRepository,
+    DeleteMentorService,
+    PauseMentorProfileService,
+    ReactivateMentorProfileService,
+  ],
 })
 export class MentorModule {}

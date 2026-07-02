@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style type="text/css">
+      @import url('https://fonts.googleapis.com/css2?family=Radio+Canada:ital,wght@0,300..700;1,300..700&display=swap');
+
+      .table-container {
+        padding: 56px 64px;
+      }
+
+      .td-logo {
+        padding-bottom: 16px;
+      }
+
+      h2 {
+        font-size: 32px;
+        line-height: 38.4px;
+        padding-bottom: 8px;
+      }
+
+      h3 {
+        font-size: 24px;
+        line-height: 28.8px;
+      }
+
+      .td-ilustration {
+        padding: 40px 0;
+      }
+
+      .td-message {
+        padding-bottom: 16px;
+      }
+
+      .p-message {
+        font-size: 16px;
+        line-height: 22.4px;
+        font-family: 'Radio Canada', sans-serif;
+        margin: 0;
+      }
+
+      .p-footer {
+        font-family: 'Radio Canada', sans-serif;
+        margin: 0;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      @media screen and (max-width: 480px) {
+        .table-container {
+          padding: 40px 32px;
+        }
+
+        .td-logo {
+          padding-bottom: 8px;
+        }
+
+        h2 {
+          font-size: 24px;
+          line-height: 28.8px;
+          padding-bottom: 4px;
+        }
+
+        h3 {
+          font-size: 20px;
+          line-height: 24px;
+        }
+
+        .td-ilustration {
+          padding: 24px 0 32px 0;
+        }
+
+        .td-message {
+          padding-bottom: 8px;
+        }
+
+        .p-message {
+          font-size: 14px;
+          line-height: 16.8px;
+        }
+      }
+    </style>
+  </head>
+
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      font-family: 'Radio Canada', sans-serif;
+      background-color: #f5f5f7;
+      color: #323232;
+    "
+  >
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td align="center">
+          <table
+            class="table-container"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            style="
+              font-family: 'Radio Canada', sans-serif;
+              max-width: 800px;
+              background-color: #ffffff;
+            "
+          >
+            <tr>
+              <td class="td-logo" align="center">
+                <img src="logo.svg" alt="Logo da SouJunior" style="max-width: 100%" />
+              </td>
+            </tr>
+            <tr>
+              <td align="center">
+                <h2
+                  style="
+                    font-family: 'Radio Canada', sans-serif;
+                    margin: 0;
+                    font-weight: 600;
+                  "
+                >
+                  Exclusão concluída
+                </h2>
+              </td>
+            </tr>
+            <tr>
+              <td align="center">
+                <h3
+                  style="
+                    font-family: 'Radio Canada', sans-serif;
+                    margin: 0;
+                    font-weight: 500;
+                  "
+                >
+                  Seu {{profileLabel}} foi removido com sucesso
+                </h3>
+              </td>
+            </tr>
+            <tr>
+              <td class="td-ilustration" align="center">
+                <img
+                  src="ilustration.svg"
+                  alt="Imagem ilustrativa de um robô"
+                  style="max-width: 100%;"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td class="td-message" align="left">
+                <p class="p-message">
+                  Olá, {{name}}. Confirmamos a exclusão do seu {{profileLabel}} na
+                  plataforma SouJunior.
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td class="td-message" align="left">
+                <p class="p-message">
+                  A exclusão foi concluída após a sua confirmação e esse perfil não
+                  poderá ser reativado automaticamente.
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td align="left">
+                <p class="p-message">
+                  Se você não reconhece esta ação, entre em contato com o suporte da
+                  SouJunior.
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td align="center">
+                <p class="p-footer" style="margin-top: 16px;">
+                  Por favor, não responda a este e-mail.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

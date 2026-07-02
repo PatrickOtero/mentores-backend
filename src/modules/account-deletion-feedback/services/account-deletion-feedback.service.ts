@@ -4,7 +4,9 @@ import { AccountDeletionFeedbackRepository } from '../repository/account-deletio
 
 @Injectable()
 export class AccountDeletionFeedbackCreateService {
-  constructor(private accountDeletionFeedbackRepository: AccountDeletionFeedbackRepository) {}
+  constructor(
+    private accountDeletionFeedbackRepository: AccountDeletionFeedbackRepository,
+  ) {}
 
   async execute(data: FormValuesDeleteAccount) {
     await this.accountDeletionFeedbackRepository.create(data);
