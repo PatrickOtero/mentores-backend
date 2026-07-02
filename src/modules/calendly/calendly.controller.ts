@@ -32,6 +32,7 @@ import {
   CreateCalendlyInviteeDto,
   GetCalendlyAvailableTimesDto,
 } from './dto/calendly-scheduling.dto';
+import { MailService } from '../mails/mail.service';
 
 @Controller('calendly')
 export class CalendlyController {
@@ -44,6 +45,7 @@ export class CalendlyController {
     private getCalendlyMentorInfoService: GetCalendlyMentorInfoService,
     private getAllCalendlyMentorInfosService: GetAllCalendlyMentorInfosService,
     private calendlySchedulingService: CalendlySchedulingService,
+    private readonly mailService: MailService,
   ) {}
 
   @Get('')
@@ -136,7 +138,14 @@ export class CalendlyController {
     @Body() data: CreateCalendlyInfoDto,
     @LoggedEntity() mentor: MentorEntity,
   ) {
-    return await this.createCalendlyInfoService.execute(data, mentor.id);
+    const result = await this.createCalendlyInfoService.execute(
+      data,
+      mentor.id,
+    );
+
+    void this.mailService.calendlyUpdated(mentor.email).catch(() => {});
+
+    return result;
   }
 
   @Put(':id')
@@ -145,6 +154,13 @@ export class CalendlyController {
     @Body() data: UpdateCalendlyInfoDto,
     @LoggedEntity() mentor: MentorEntity,
   ) {
-    return await this.updateCalendlyInfoService.execute(mentor.id, data);
+    const result = await this.updateCalendlyInfoService.execute(
+      mentor.id,
+      data,
+    );
+
+    void this.mailService.calendlyUpdated(mentor.email).catch(() => {});
+
+    return result;
   }
 }

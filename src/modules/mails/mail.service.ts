@@ -299,6 +299,26 @@ export class MailService {
     return;
   }
 
+  async calendlyUpdated(email: string): Promise<void> {
+    try {
+      const { FRONTEND_URL } = process.env;
+      const urlHome = `${FRONTEND_URL}/home`;
+      await this.mailerService
+        .sendMail({
+          to: email,
+          subject:
+            '📆 Sua agenda está atualizada!  Agora você está disponível para novas mentorias 💙',
+          template: './calendlyUpdated',
+          context: {
+            urlHome,
+          },
+        })
+        .catch(handleError);
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
   async sendEmail({ subject, template, context, email }: EmailTemplateType) {
     return; // remover depois que for resolvido
     await this.mailerService.sendMail({
