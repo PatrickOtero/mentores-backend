@@ -17,13 +17,24 @@ describe('handleError', () => {
   });
 
   it('deve usar a ultima linha da mensagem quando o erro possui varias linhas', () => {
-    const msg =
-      'Invalid `prisma.user.create()`\n invocation:Unique constraint failed on the fields: (`email`)';
+    const expectedMessage =
+      'Unique constraint failed on the fields: (email)';
+    const error = new Error(
+      [
+        'Invalid prisma.user.create() invocation:',
+        expectedMessage,
+      ].join('\n'),
+    );
 
-    const errorLines = msg.split('\n');
-    const lastErrorLine = errorLines[errorLines.length - 1]?.trim();
-    const error = new Error(msg);
+    expect.assertions(2);
 
-    expect(() => handleError(error)).toThrow(lastErrorLine);
+    try {
+      handleError(error);
+    } catch (exception) {
+      expect(exception).toBeInstanceOf(UnprocessableEntityException);
+      expect((exception as UnprocessableEntityException).message).toBe(
+        expectedMessage,
+      );
+    }
   });
 });
