@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../../prisma/service/prisma.service';
 import {
   CreateCalendlyInfoDto,
@@ -48,19 +48,28 @@ export class CalendlyRepository {
       },
     });
   }
-
-  async createCalendlyInfo(data: CreateCalendlyInfoDto, mentorId: string) {
+  private async validateCalendlyUserUuid(
+    calendlyUserUuid: string,
+    mentorId: string,
+  ) {
     const existingCalendlyInfo = await this.prisma.calendlyInfo.findFirst({
       where: {
-        calendlyUserUuid: data.calendlyUserUuid,
+        calendlyUserUuid,
+        mentorId: {
+          not: mentorId,
+        },
       },
     });
 
     if (existingCalendlyInfo) {
-      throw new ConflictException(
-        'Não foi possível vincular esta agenda. Verifique se ela já está em uso por outro mentor.',
+      throw new BadRequestException(
+        'não foi possível vincular esta agenda.verifique se ela já está em uso',
       );
     }
+  }
+
+  async createCalendlyInfo(data: CreateCalendlyInfoDto, mentorId: string) {
+    await this.validateCalendlyUserUuid(data.calendlyUserUuid, mentorId);
 
     Object.assign(data, {
       mentorId,
@@ -74,6 +83,13 @@ export class CalendlyRepository {
     mentorId: string,
     updateCalendlyInfoDto: UpdateCalendlyInfoDto,
   ) {
+    if (updateCalendlyInfoDto.calendlyUserUuid) {
+      await this.validateCalendlyUserUuid(
+        updateCalendlyInfoDto.calendlyUserUuid,
+        mentorId,
+      );
+    }
+
     return this.prisma.calendlyInfo.upsert({
       where: { mentorId },
       update: updateCalendlyInfoDto,
