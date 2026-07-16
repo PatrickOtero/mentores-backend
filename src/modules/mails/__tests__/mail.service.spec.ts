@@ -4,16 +4,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MailService } from '../mail.service';
 
 describe('MailService.calendlyUpdated', () => {
+  const frontendUrlMock = 'https://frontend.test';
+  const originalFrontendUrl = process.env.FRONTEND_URL;
+
   let service: MailService;
   let mailerService: {
     sendMail: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
-    expect(
-      process.env.FRONTEND_URL?.trim(),
-      'FRONTEND_URL must be defined and non-empty in the environment',
-    ).toBeTruthy();
+    process.env.FRONTEND_URL = frontendUrlMock;
 
     mailerService = {
       sendMail: vi.fn().mockResolvedValue(undefined),
@@ -23,6 +23,7 @@ describe('MailService.calendlyUpdated', () => {
   });
 
   afterEach(() => {
+    process.env.FRONTEND_URL = originalFrontendUrl;
     vi.restoreAllMocks();
   });
 
@@ -35,7 +36,7 @@ describe('MailService.calendlyUpdated', () => {
         to: 'mentor@email.com',
         template: './calendlyUpdated',
         context: {
-          urlHome: `${process.env.FRONTEND_URL}/home`,
+          urlHome: `${frontendUrlMock}/home`,
         },
       }),
     );
