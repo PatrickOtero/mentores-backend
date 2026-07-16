@@ -3,13 +3,17 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { CalendlyRepository } from '../repository/calendly.repository';
+
 import { IHttpAdapter } from '../../../lib/adapter/httpAdapterInterface';
+import { GetMentorByIdService } from 'src/modules/mentors/services/getMentorById.service';
+import { UpdateCalendlyInfoDto } from '../dto/calendly-info-dto';
+import { UpdateCalendlyInfoService } from './update-calendly-info.service';
 
 @Injectable()
 export class OAuthCallbackService {
   constructor(
-    private readonly calendlyRepository: CalendlyRepository,
+    private readonly updateCalendlyInfo: UpdateCalendlyInfoService,
+    private readonly getMentorByIdService: GetMentorByIdService,
     @Inject('IHttpAdapter') private readonly httpAdapter: IHttpAdapter,
   ) {}
 
@@ -37,11 +41,24 @@ export class OAuthCallbackService {
       const expiresIn = tokenResponse.expires_in;
       const expirationTime = new Date(Date.now() + expiresIn * 1000);
 
-      await this.calendlyRepository.updateCalendlyInfo(mentorId, {
-        calendlyAccessToken: accessToken,
-        calendlyRefreshToken: refreshToken,
-        accessTokenExpiration: expirationTime,
-      });
+      const mentorResult = await this.getMentorByIdService.execute(mentorId);
+
+      if (mentorResult.status === 200) {
+        const mentor = mentorResult.data;
+
+        const calendlyInfoDto: UpdateCalendlyInfoDto = {
+          calendlyAccessToken: accessToken,
+          calendlyRefreshToken: refreshToken,
+          accessTokenExpiration: expirationTime,
+        };
+
+        await this.updateCalendlyInfo.execute(
+          mentor.id,
+          calendlyInfoDto,
+          mentor.email,
+          false
+        );
+      }
 
       return { message: 'OAuth successful' };
     } catch (error) {

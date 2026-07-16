@@ -18,6 +18,7 @@ import { CalendlySchedulingService } from './services/calendly-scheduling.servic
 import { UserRepository } from '../user/user.repository';
 import { MentorshipFeedbackRepository } from '../mentorship-feedback/repository/mentorship-feedback.repository';
 import { SyncMentorshipHistoryService } from '../mentorship-feedback/services/sync-mentorship-history.service';
+import { GetMentorByIdService } from '../mentors/services/getMentorById.service';
 
 @Module({
   imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
@@ -31,6 +32,7 @@ import { SyncMentorshipHistoryService } from '../mentorship-feedback/services/sy
     UpdateCalendlyInfoService,
     GetCalendlyMentorInfoService,
     GetAllCalendlyMentorInfosService,
+    GetMentorByIdService,
     CalendlySchedulingService,
     MentorshipFeedbackRepository,
     SyncMentorshipHistoryService,
