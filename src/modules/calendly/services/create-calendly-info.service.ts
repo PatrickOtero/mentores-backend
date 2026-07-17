@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CalendlyRepository } from '../repository/calendly.repository';
 import { CreateCalendlyInfoDto } from '../dto/calendly-info-dto';
 
@@ -14,9 +18,14 @@ export class CreateCalendlyInfoService {
       );
       return calendlyInfo;
     } catch (error) {
-      console.error('Error creating Calendly info:', error.message);
+      console.error('Error updating Calendly info:', error);
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
       throw new InternalServerErrorException(
-        'Could not create Calendly info in the database',
+        'Could not update Calendly info in the database',
       );
     }
   }

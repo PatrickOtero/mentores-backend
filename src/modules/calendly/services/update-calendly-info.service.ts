@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CalendlyRepository } from '../repository/calendly.repository';
 import { UpdateCalendlyInfoDto } from '../dto/calendly-info-dto';
 import { MentorRepository } from '../../../modules/mentors/repository/mentor.repository';
@@ -21,7 +25,12 @@ export class UpdateCalendlyInfoService {
 
       return calendlyInfo;
     } catch (error) {
-      console.error('Error updating Calendly info:', error.message);
+      console.error('Error updating Calendly info:', error);
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
       throw new InternalServerErrorException(
         'Could not update Calendly info in the database',
       );

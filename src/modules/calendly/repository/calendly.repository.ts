@@ -63,7 +63,7 @@ export class CalendlyRepository {
 
     if (existingCalendlyInfo) {
       throw new BadRequestException(
-        'não foi possível vincular esta agenda.verifique se ela já está em uso',
+        'não foi possível vincular esta agenda.verifique se ela já está em uso e, se precisar, entre em contato com o suporte.',
       );
     }
   }
