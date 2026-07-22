@@ -8,6 +8,7 @@ import { IHttpAdapter } from '../../../lib/adapter/httpAdapterInterface';
 import { GetMentorByIdService } from 'src/modules/mentors/services/getMentorById.service';
 import { UpdateCalendlyInfoDto } from '../dto/calendly-info-dto';
 import { UpdateCalendlyInfoService } from './update-calendly-info.service';
+import { CustomNotFoundException } from 'src/shared/exceptions/notFound.exception';
 
 @Injectable()
 export class OAuthCallbackService {
@@ -43,22 +44,24 @@ export class OAuthCallbackService {
 
       const mentorResult = await this.getMentorByIdService.execute(mentorId);
 
-      if (mentorResult.status === 200) {
-        const mentor = mentorResult.data;
-
-        const calendlyInfoDto: UpdateCalendlyInfoDto = {
-          calendlyAccessToken: accessToken,
-          calendlyRefreshToken: refreshToken,
-          accessTokenExpiration: expirationTime,
-        };
-
-        await this.updateCalendlyInfo.execute(
-          mentor.id,
-          calendlyInfoDto,
-          mentor.email,
-          false
-        );
+      if (mentorResult.status !== 200 || !mentorResult.data) {
+        throw new CustomNotFoundException('Mentor not found');
       }
+
+      const mentor = mentorResult.data;
+
+      const calendlyInfoDto: UpdateCalendlyInfoDto = {
+        calendlyAccessToken: accessToken,
+        calendlyRefreshToken: refreshToken,
+        accessTokenExpiration: expirationTime,
+      };
+
+      await this.updateCalendlyInfo.execute(
+        mentor.id,
+        calendlyInfoDto,
+        mentor.email,
+        false,
+      );
 
       return { message: 'OAuth successful' };
     } catch (error) {
