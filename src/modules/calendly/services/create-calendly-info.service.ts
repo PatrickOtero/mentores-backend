@@ -18,14 +18,14 @@ export class CreateCalendlyInfoService {
       );
       return calendlyInfo;
     } catch (error) {
-      console.error('Error updating Calendly info:', error);
+      console.error('Error creating Calendly info:', error);
 
       if (error instanceof HttpException) {
         throw error;
       }
 
       throw new InternalServerErrorException(
-        'Could not update Calendly info in the database',
+        'Could not create Calendly info in the database',
       );
     }
   }
