@@ -6,22 +6,35 @@ import {
 import { CalendlyRepository } from '../repository/calendly.repository';
 import { UpdateCalendlyInfoDto } from '../dto/calendly-info-dto';
 import { MentorRepository } from '../../../modules/mentors/repository/mentor.repository';
+import { MailService } from 'src/modules/mails/mail.service';
 
 @Injectable()
 export class UpdateCalendlyInfoService {
   constructor(
     private readonly calendlyRepository: CalendlyRepository,
     private readonly mentorRepository: MentorRepository,
+    private readonly mailService: MailService,
   ) {}
 
-  async execute(mentorId: string, data: UpdateCalendlyInfoDto) {
+  async execute(
+    mentorId: string,
+    data: UpdateCalendlyInfoDto,
+    mentorEmail?: string,
+    shouldRegisterComplete = true,
+  ) {
     try {
-      await this.mentorRepository.registerCompleteToggle(mentorId);
+      if (shouldRegisterComplete) {
+        await this.mentorRepository.registerCompleteToggle(mentorId);
+      }
 
       const calendlyInfo = await this.calendlyRepository.updateCalendlyInfo(
         mentorId,
         data,
       );
+
+      if (mentorEmail) {
+        void this.mailService.calendlyUpdated(mentorEmail).catch(() => {});
+      }
 
       return calendlyInfo;
     } catch (error) {

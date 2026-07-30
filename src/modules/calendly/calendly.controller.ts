@@ -136,7 +136,13 @@ export class CalendlyController {
     @Body() data: CreateCalendlyInfoDto,
     @LoggedEntity() mentor: MentorEntity,
   ) {
-    return await this.createCalendlyInfoService.execute(data, mentor.id);
+    const result = await this.createCalendlyInfoService.execute(
+      data,
+      mentor.id,
+      mentor.email,
+    );
+
+    return result;
   }
 
   @Put(':id')
@@ -145,6 +151,12 @@ export class CalendlyController {
     @Body() data: UpdateCalendlyInfoDto,
     @LoggedEntity() mentor: MentorEntity,
   ) {
-    return await this.updateCalendlyInfoService.execute(mentor.id, data);
+    const result = await this.updateCalendlyInfoService.execute(
+      mentor.id,
+      data,
+      mentor.email,
+    );
+
+    return result;
   }
 }
