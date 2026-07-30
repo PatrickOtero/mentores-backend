@@ -1,4 +1,5 @@
 import {
+  HttpException,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -69,6 +70,11 @@ export class OAuthCallbackService {
         'Error during OAuth process:',
         error.response?.data || error.message,
       );
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
       throw new InternalServerErrorException(
         'OAuth process failed. Please try again.',
       );
