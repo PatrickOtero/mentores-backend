@@ -299,6 +299,19 @@ export class MailService {
     return;
   }
 
+  async userSendPasswordUpdatedConfirmation(user: UserEntity): Promise<void> {
+    const { email, fullName } = user;
+
+    await this.sendEmail({
+      email,
+      subject: 'Senha alterada com sucesso! - SouJunior',
+      template: './passwordupdate',
+      context: {
+        name: fullName,
+      },
+    });
+  }
+
   async calendlyUpdated(email: string): Promise<void> {
     try {
       const { FRONTEND_URL } = process.env;
