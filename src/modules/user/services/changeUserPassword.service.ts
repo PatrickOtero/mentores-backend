@@ -31,18 +31,22 @@ export class ChangeUserPasswordService {
 
     try {
       await this.userRepository.updateUser(user.id, loggedUser);
-
-      await this.mailService.userSendPasswordUpdatedConfirmation(loggedUser);
-
-      return {
-        status: 200,
-        message: 'Password changed successfully',
-      };
     } catch (error) {
       return {
         status: 400,
         message: 'Something went wrong in the database',
       };
     }
+
+    try {
+      await this.mailService.userSendPasswordUpdatedConfirmation(loggedUser);
+    } catch (error) {
+      console.error('Failed to send password update confirmation email', error);
+    }
+
+    return {
+      status: 200,
+      message: 'Password changed successfully',
+    };
   }
 }

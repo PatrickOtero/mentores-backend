@@ -302,8 +302,8 @@ export class MailService {
   async userSendPasswordUpdatedConfirmation(user: UserEntity): Promise<void> {
     const { email, fullName } = user;
 
-    await this.sendEmail({
-      email,
+    await this.mailerService.sendMail({
+      to: email,
       subject: 'Senha alterada com sucesso! - SouJunior',
       template: './passwordupdate',
       context: {
