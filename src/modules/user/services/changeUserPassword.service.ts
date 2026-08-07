@@ -3,10 +3,14 @@ import { Injectable } from '@nestjs/common';
 import { UserEntity } from '../entities/user.entity';
 import { UserRepository } from '../user.repository';
 import { UserChangePassDto } from '../dto/user-change-pass.dto';
+import { MailService } from 'src/modules/mails/mail.service';
 
 @Injectable()
 export class ChangeUserPasswordService {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    private userRepository: UserRepository,
+    private mailService: MailService,
+  ) {}
 
   async execute(user: UserEntity, data: UserChangePassDto) {
     const loggedUser = await this.userRepository.findFullUserById(user.id);
@@ -27,16 +31,22 @@ export class ChangeUserPasswordService {
 
     try {
       await this.userRepository.updateUser(user.id, loggedUser);
-
-      return {
-        status: 200,
-        message: 'Password changed successfully',
-      };
     } catch (error) {
       return {
         status: 400,
         message: 'Something went wrong in the database',
       };
     }
+
+    try {
+      await this.mailService.userSendPasswordUpdatedConfirmation(loggedUser);
+    } catch (error) {
+      console.error('Failed to send password update confirmation email', error);
+    }
+
+    return {
+      status: 200,
+      message: 'Password changed successfully',
+    };
   }
 }
