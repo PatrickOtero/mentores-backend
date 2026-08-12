@@ -305,7 +305,7 @@ export class MailService {
     await this.mailerService.sendMail({
       to: email,
       subject: 'Senha alterada com sucesso! - SouJunior',
-      template: './passwordupdate',
+      template: './passwordchangedconfirmation',
       context: {
         name: fullName,
       },
