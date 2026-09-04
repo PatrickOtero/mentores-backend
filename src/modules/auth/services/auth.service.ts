@@ -131,7 +131,7 @@ export class AuthService {
   async infoConfirm(info: InfoEntity, type: LoginTypeEnum | string) {
     if (!info || info.deleted) {
       this.throwAuthException(
-        HttpStatus.NOT_FOUND,
+        HttpStatus.UNAUTHORIZED,
         AuthErrorCodeEnum.INVALID_CREDENTIALS,
         INVALID_CREDENTIALS_MESSAGE,
       );
@@ -301,7 +301,7 @@ export class AuthService {
     }
 
     this.throwAuthException(
-      HttpStatus.NOT_FOUND,
+      HttpStatus.UNAUTHORIZED,
       AuthErrorCodeEnum.INVALID_CREDENTIALS,
       INVALID_CREDENTIALS_MESSAGE,
     );
