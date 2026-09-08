@@ -27,10 +27,12 @@ export class ChangeUserPasswordService {
       };
     }
 
-    loggedUser.password = await bcrypt.hash(data.password, 10);
+    const hashedPassword = await bcrypt.hash(data.password, 10);
 
     try {
-      await this.userRepository.updateUser(user.id, loggedUser);
+      await this.userRepository.updateUser(user.id, {
+        password: hashedPassword,
+      });
     } catch (error) {
       return {
         status: 400,
