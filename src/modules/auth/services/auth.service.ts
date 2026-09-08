@@ -297,7 +297,7 @@ export class AuthService {
           ? AuthErrorCodeEnum.ACCOUNT_BLOCKED
           : AuthErrorCodeEnum.PASSWORD_ATTEMPT_WARNING;
 
-      this.throwAuthException(HttpStatus.NOT_FOUND, code, message);
+      this.throwAuthException(HttpStatus.UNAUTHORIZED, code, message);
     }
 
     this.throwAuthException(
