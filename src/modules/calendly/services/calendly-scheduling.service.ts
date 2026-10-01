@@ -239,6 +239,7 @@ export class CalendlySchedulingService {
       );
 
       const eventTypes: CalendlyEventType[] = response.collection || [];
+
       const schedulingUrl = this.buildSchedulingUrl(
         calendlyInfo.calendlyName,
         calendlyInfo.agendaName,
@@ -246,10 +247,13 @@ export class CalendlySchedulingService {
 
       const eventType = eventTypes.find((type) => {
         const typeUrl = type.scheduling_url?.replace(/\/$/, '');
+
+        const agendaName = calendlyInfo.agendaName?.replace(/^\/|\/$/g, '');
+
         return (
           typeUrl === schedulingUrl ||
-          type.slug === calendlyInfo.agendaName ||
-          type.uri?.endsWith(`/${calendlyInfo.agendaName}`)
+          type.slug === agendaName ||
+          type.uri?.endsWith(`/${agendaName}`)
         );
       });
 
@@ -269,6 +273,7 @@ export class CalendlySchedulingService {
         'Error fetching Calendly event types:',
         error.response?.data || error.message,
       );
+
       throw new InternalServerErrorException(
         'Não foi possível buscar o tipo de evento do Calendly.',
       );

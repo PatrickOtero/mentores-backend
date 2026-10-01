@@ -131,7 +131,7 @@ export class AuthService {
   async infoConfirm(info: InfoEntity, type: LoginTypeEnum | string) {
     if (!info || info.deleted) {
       this.throwAuthException(
-        HttpStatus.NOT_FOUND,
+        HttpStatus.UNAUTHORIZED,
         AuthErrorCodeEnum.INVALID_CREDENTIALS,
         INVALID_CREDENTIALS_MESSAGE,
       );
@@ -297,11 +297,11 @@ export class AuthService {
           ? AuthErrorCodeEnum.ACCOUNT_BLOCKED
           : AuthErrorCodeEnum.PASSWORD_ATTEMPT_WARNING;
 
-      this.throwAuthException(HttpStatus.NOT_FOUND, code, message);
+      this.throwAuthException(HttpStatus.UNAUTHORIZED, code, message);
     }
 
     this.throwAuthException(
-      HttpStatus.NOT_FOUND,
+      HttpStatus.UNAUTHORIZED,
       AuthErrorCodeEnum.INVALID_CREDENTIALS,
       INVALID_CREDENTIALS_MESSAGE,
     );
