@@ -47,6 +47,7 @@ export class CalendlyController {
   ) {}
 
   @Get('')
+  @UseGuards(AuthGuard())
   async getAllCalendlyMentorInfos() {
     return await this.getAllCalendlyMentorInfosService.execute();
   }
