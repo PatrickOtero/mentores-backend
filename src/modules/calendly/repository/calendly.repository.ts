@@ -65,16 +65,43 @@ export class CalendlyRepository {
   }
 
   async createCalendlyInfo(data: CreateCalendlyInfoDto, mentorId: string) {
-    await this.validateCalendlyUserUuid(data.calendlyUserUuid, mentorId);
+    if (data.calendlyUserUuid) {
+      await this.validateCalendlyUserUuid(data.calendlyUserUuid, mentorId);
+    }
 
-    Object.assign(data, {
-      mentorId,
-    });
+    const {
+      calendlyUserUuid,
+      calendlyAccessToken,
+      calendlyRefreshToken,
+      accessTokenExpiration,
+      calendlyName,
+      agendaName,
+    } = data;
 
-    return this.prisma.calendlyInfo.create({
-      data,
+    const updateData = {
+      calendlyName,
+      agendaName,
+      ...(calendlyUserUuid && { calendlyUserUuid }),
+      ...(calendlyAccessToken && { calendlyAccessToken }),
+      ...(calendlyRefreshToken && { calendlyRefreshToken }),
+      ...(accessTokenExpiration && { accessTokenExpiration }),
+    };
+
+    return this.prisma.calendlyInfo.upsert({
+      where: { mentorId },
+      update: updateData,
+      create: {
+        mentorId,
+        calendlyName,
+        agendaName,
+        ...(calendlyUserUuid && { calendlyUserUuid }),
+        ...(calendlyAccessToken && { calendlyAccessToken }),
+        ...(calendlyRefreshToken && { calendlyRefreshToken }),
+        ...(accessTokenExpiration && { accessTokenExpiration }),
+      },
     });
   }
+
   async updateCalendlyInfo(
     mentorId: string,
     updateCalendlyInfoDto: UpdateCalendlyInfoDto,
