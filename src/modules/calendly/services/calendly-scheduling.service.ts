@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ForbiddenException,
+  HttpException,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -221,13 +222,36 @@ export class CalendlySchedulingService {
     const calendlyInfo =
       await this.calendlyRepository.getCalendlyInfoByMentorId(mentorId);
 
-    const calendlyUserUuid =
-      calendlyInfo?.calendlyUserUuid ||
-      (await this.fetchAndSaveMentorUuid(mentorId, accessToken));
-
-    const userUri = `https://api.calendly.com/users/${calendlyUserUuid}`;
+    if (!calendlyInfo) {
+      throw new NotFoundException(
+        'Configuração do Calendly não encontrada para este mentor.',
+      );
+    }
 
     try {
+      const userResponse = await this.httpAdapter.get('/users/me', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: 'application/json',
+        },
+      });
+
+      const userUri: string | undefined = userResponse.resource?.uri;
+
+      const match = userUri?.match(
+        /^https:\/\/api\.calendly\.com\/users\/([^/]+)\/?$/,
+      );
+
+      if (!match || !userUri) {
+        throw new BadRequestException(
+          'Não foi possível identificar a conta autenticada do Calendly.',
+        );
+      }
+
+      const calendlyUserUuid = match[1];
+
+      await this.validateCalendlyUserUuid(calendlyUserUuid, mentorId);
+
       const response = await this.httpAdapter.get(
         `/event_types?user=${encodeURIComponent(userUri)}&active=true`,
         {
@@ -245,10 +269,10 @@ export class CalendlySchedulingService {
         calendlyInfo.agendaName,
       );
 
+      const agendaName = calendlyInfo.agendaName?.replace(/^\/|\/$/g, '');
+
       const eventType = eventTypes.find((type) => {
         const typeUrl = type.scheduling_url?.replace(/\/$/, '');
-
-        const agendaName = calendlyInfo.agendaName?.replace(/^\/|\/$/g, '');
 
         return (
           typeUrl === schedulingUrl ||
@@ -265,12 +289,12 @@ export class CalendlySchedulingService {
 
       return eventType;
     } catch (error) {
-      if (error instanceof NotFoundException) {
+      if (error instanceof HttpException) {
         throw error;
       }
 
       console.error(
-        'Error fetching Calendly event types:',
+        'Erro ao buscar tipos de evento do Calendly:',
         error.response?.data || error.message,
       );
 
@@ -279,7 +303,27 @@ export class CalendlySchedulingService {
       );
     }
   }
+  private async validateCalendlyUserUuid(
+    calendlyUserUuid: string,
+    mentorId: string,
+  ): Promise<void> {
+    const calendlyInfo =
+      await this.calendlyRepository.getCalendlyInfoByMentorId(mentorId);
 
+    if (!calendlyInfo) {
+      throw new NotFoundException(
+        'Configuração do Calendly não encontrada para este mentor.',
+      );
+    }
+    if (
+      calendlyInfo.calendlyUserUuid &&
+      calendlyInfo.calendlyUserUuid !== calendlyUserUuid
+    ) {
+      throw new BadRequestException(
+        'A conta autenticada do Calendly não pertence a este mentor.',
+      );
+    }
+  }
   private buildSchedulingUrl(calendlyName?: string, agendaName?: string) {
     if (!calendlyName || !agendaName) {
       throw new BadRequestException(

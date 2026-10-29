@@ -9,17 +9,19 @@ export class GetAllCalendlyMentorInfosService {
     try {
       const calendlyInfo =
         await this.calendlyRepository.getAllCalendlyMentorInfos();
+
       return calendlyInfo.map((info) => ({
         id: info.id,
         mentorId: info.mentorId,
         calendlyName: info.calendlyName,
         agendaName: info.agendaName,
-        isConnected: Boolean(
-          info.calendlyAccessToken && info.calendlyRefreshToken,
-        ),
       }));
     } catch (error) {
-      console.error('Error returning Calendly info:', error.message);
+      console.error(
+        'Error returning Calendly info:',
+        error instanceof Error ? error.message : error,
+      );
+
       throw new InternalServerErrorException(
         'Could not find Calendly info in the database',
       );
